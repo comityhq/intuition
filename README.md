@@ -241,6 +241,10 @@ A 31-case benchmark of small real-world projects: 20 changes with a planted prob
 
 Run it yourself (uses your agent subscription): `npm run build && npm run eval -- --reviewer claude`. Raw reviewer outputs are in `eval/results/raw/`; `npm run eval:rescore` re-scores the saved reports and regenerates the summary without calling any AI.
 
+## Credits
+
+The idea came from [Aaron Gabriel Cornejo](https://www.linkedin.com/in/aarongabrielcornejo/), who explained the problem he kept running into: non-technical business people need a way to know whether their AI agents' work is safe to ship, without reading the code. Thank you, Aaron.
+
 ## Contributing
 
 Issues and pull requests are welcome; see [CONTRIBUTING.md](CONTRIBUTING.md). Security reports: [SECURITY.md](SECURITY.md). MIT licensed.
