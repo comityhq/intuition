@@ -2,7 +2,7 @@ import { appendFile } from "node:fs/promises";
 import { join } from "node:path";
 import { loadConfig, type Config } from "./config.js";
 import { findRepoRoot, resolveTreeish, snapshotWorkingTree } from "./git.js";
-import { ensureIntuitionDir, intuitionDir } from "./paths.js";
+import { canonicalPath, ensureIntuitionDir, intuitionDir } from "./paths.js";
 import { chatPresentation, statusLine, type PresentedReview } from "./present.js";
 import type { AgentId } from "./report/types.js";
 import { NoChangesError, resolveReviewer, runReview, type BuilderSession, type ReviewerRunner } from "./review.js";
@@ -67,17 +67,23 @@ export interface HookResult {
   skipped?: SkipReason;
 }
 
-/** The agent's project directory: Claude Code exports CLAUDE_PROJECT_DIR (where its session lives); else hook cwd. */
+/**
+ * The agent's project directory: Claude Code exports CLAUDE_PROJECT_DIR (where its session lives); else hook cwd.
+ * Deliberately NOT canonicalized: Claude Code finds a session to fork by the exact folder spelling it started in,
+ * so the reviewer must run in that same spelling. Everything we compare uses the canonical repo root instead.
+ */
 function agentCwd(agent: AgentId, input: HookInput, env: NodeJS.ProcessEnv): string | null {
   return (agent === "claude" ? env.CLAUDE_PROJECT_DIR : undefined) ?? input.cwd ?? null;
 }
+
+const transcriptOf = (input: HookInput) => (input.transcript_path ? canonicalPath(input.transcript_path) : null);
 
 /** UserPromptSubmit: remember the working tree as it was before the agent starts this turn. */
 async function onPrompt(agent: AgentId, input: HookInput, repo: string, env: NodeJS.ProcessEnv): Promise<HookResult> {
   const sessionId = input.session_id ?? "unknown";
   await ensureIntuitionDir(repo);
   const state = await loadState(repo);
-  const session = touchSession(state, sessionId, agent, input.transcript_path ?? null, agentCwd(agent, input, env));
+  const session = touchSession(state, sessionId, agent, transcriptOf(input), agentCwd(agent, input, env));
   // Keep an older base if the previous turn never reached Stop (interrupted), so its changes still get reviewed.
   if (!session.turnBase) session.turnBase = (await snapshotWorkingTree(repo)).tree;
   await saveState(repo, state);
@@ -90,7 +96,7 @@ async function onStop(agent: AgentId, input: HookInput, repo: string, config: Co
   const cwd = agentCwd(agent, input, env) ?? repo;
   await ensureIntuitionDir(repo);
   const state = await loadState(repo);
-  const session = touchSession(state, sessionId, agent, input.transcript_path ?? null, cwd);
+  const session = touchSession(state, sessionId, agent, transcriptOf(input), cwd);
   const snapshot = await snapshotWorkingTree(repo);
   const base = session.turnBase ?? session.lastReviewed ?? (await resolveTreeish(repo, "HEAD"));
   const baseTree = await resolveTreeish(repo, `${base}^{tree}`).catch(() => base);
@@ -112,7 +118,7 @@ async function onStop(agent: AgentId, input: HookInput, repo: string, config: Co
   const builder: BuilderSession = {
     agent,
     sessionId: input.session_id ?? null,
-    transcriptPath: input.transcript_path ?? null,
+    transcriptPath: transcriptOf(input),
     lastMessage: input.last_assistant_message ?? null,
   };
   const primaryAgent = resolveReviewer(config.reviewer, builder);

@@ -2,6 +2,7 @@ import { execFile } from "node:child_process";
 import { copyFile, rm, stat } from "node:fs/promises";
 import { join } from "node:path";
 import { randomBytes } from "node:crypto";
+import { canonicalPath } from "./paths.js";
 
 /** git's well-known empty tree: the base for repositories without any commit yet. */
 export const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
@@ -44,10 +45,10 @@ export function git(args: string[], opts: GitOptions): Promise<string> {
   return promise;
 }
 
-/** Absolute repo root (forward slashes on every OS), or null when `dir` is not inside a git work tree. */
+/** Absolute, canonical repo root (see canonicalPath), or null when `dir` is not inside a git work tree. */
 export async function findRepoRoot(dir: string): Promise<string | null> {
-  const out = await git(["rev-parse", "--show-toplevel"], { cwd: dir, allowFail: true });
-  return out.trim() || null;
+  const out = (await git(["rev-parse", "--show-toplevel"], { cwd: dir, allowFail: true })).trim();
+  return out ? canonicalPath(out) : null;
 }
 
 /** Resolve a ref to a commit or tree id. "HEAD" in a repo without commits resolves to the empty tree. */

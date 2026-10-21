@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 import { rm } from "node:fs/promises";
-import { join, relative } from "node:path";
+import { isAbsolute, join, relative } from "node:path";
 import { parseArgs } from "node:util";
 import {
   CONFIG_KEYS,
@@ -17,7 +17,7 @@ import { findRepoRoot, resolveTreeish } from "./git.js";
 import { handleHook, parseHookInput, type HookEvent } from "./hook.js";
 import { installHooks, packageVersion, settingsFile, uninstallHooks, type HookAgent, type InstallChange, type Scope } from "./install.js";
 import { openInBrowser } from "./open.js";
-import { ensureIntuitionDir, intuitionDir } from "./paths.js";
+import { canonicalPath, ensureIntuitionDir, intuitionDir } from "./paths.js";
 import { reviewDigest } from "./present.js";
 import { AGENT_NAME, VERDICT_LABEL } from "./report/render.js";
 import { loadReport, reportPaths } from "./report/store.js";
@@ -78,8 +78,10 @@ async function requireRepo(path: string | undefined): Promise<string> {
   return repo;
 }
 
-function describeChange(c: InstallChange, cwd: string, dryRun: boolean): string {
-  const file = relative(cwd, c.file).startsWith("..") ? c.file : relative(cwd, c.file) || c.file;
+/** Show `file` relative to the current folder when it's inside it. Both sides canonical, so symlinks/8.3 names agree. */
+function describeChange(c: InstallChange, dryRun: boolean): string {
+  const rel = relative(canonicalPath(process.cwd()), canonicalPath(c.file));
+  const file = rel && !rel.startsWith("..") && !isAbsolute(rel) ? rel : c.file;
   const verb = dryRun
     ? { created: "Would create", updated: "Would update", unchanged: "Already up to date:", removed: "Would remove hooks from", "not-found": "No hooks found in" }
     : { created: "Created", updated: "Updated", unchanged: "Already up to date:", removed: "Removed hooks from", "not-found": "No hooks found in" };
@@ -105,11 +107,11 @@ async function cmdInit(argv: string[]): Promise<number> {
       lines.push(`Skipped ${AGENT_NAME[agent]}: not installed.`);
       continue;
     }
-    lines.push(describeChange(await installHooks(agent, settingsFile(agent, scope, repo), dryRun), process.cwd(), dryRun));
+    lines.push(describeChange(await installHooks(agent, settingsFile(agent, scope, repo), dryRun), dryRun));
   }
   if (repo) {
     if (!dryRun) await ensureIntuitionDir(repo);
-    lines.push(`${dryRun ? "Would create" : "Reports folder:"} ${join(relative(process.cwd(), intuitionDir(repo)) || ".", "reports")} (git-ignored via .intuition/.gitignore)`);
+    lines.push(`${dryRun ? "Would create" : "Reports folder:"} ${join(relative(canonicalPath(process.cwd()), intuitionDir(repo)) || ".", "reports")} (git-ignored via .intuition/.gitignore)`);
   }
   if (!dryRun) {
     lines.push(
@@ -138,7 +140,7 @@ async function cmdUninstall(argv: string[]): Promise<number> {
   const repo = scope === "project" ? await requireRepo(values.repo) : await findRepoRoot(process.cwd());
   const agents: HookAgent[] = agentFlag === "all" ? ["claude", "codex"] : [agentFlag];
   const lines: string[] = dryRun ? ["Dry run: nothing was changed."] : [];
-  for (const agent of agents) lines.push(describeChange(await uninstallHooks(agent, settingsFile(agent, scope, repo), dryRun), process.cwd(), dryRun));
+  for (const agent of agents) lines.push(describeChange(await uninstallHooks(agent, settingsFile(agent, scope, repo), dryRun), dryRun));
   if (values.purge && repo) {
     if (!dryRun) await rm(intuitionDir(repo), { recursive: true, force: true });
     lines.push(`${dryRun ? "Would delete" : "Deleted"} ${intuitionDir(repo)} (saved reports and settings)`);

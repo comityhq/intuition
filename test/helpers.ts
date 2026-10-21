@@ -2,6 +2,7 @@ import { execFileSync } from "node:child_process";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
+import { canonicalPath } from "../src/paths.js";
 import type { ReviewContent } from "../src/report/types.js";
 
 export function sh(cwd: string, ...args: string[]): string {
@@ -13,9 +14,9 @@ export function write(root: string, file: string, content: string | Buffer): voi
   writeFileSync(join(root, file), content);
 }
 
-/** A throwaway git repo with one commit containing `files`. Forward-slash path like git reports it. */
+/** A throwaway git repo with one commit containing `files`. Canonical path, like findRepoRoot reports it. */
 export function tempRepo(files: Record<string, string> = { "README.md": "# demo\n" }, commit = true): string {
-  const dir = mkdtempSync(join(tmpdir(), "intuition-test-")).replace(/\\/g, "/");
+  const dir = tempDir();
   sh(dir, "init", "-q");
   sh(dir, "config", "user.email", "test@example.com");
   sh(dir, "config", "user.name", "Test");
@@ -28,8 +29,9 @@ export function tempRepo(files: Record<string, string> = { "README.md": "# demo\
   return dir;
 }
 
+/** A fresh temp folder, canonical (tmpdir can be a symlink on macOS or an 8.3 short name on Windows). */
 export function tempDir(): string {
-  return mkdtempSync(join(tmpdir(), "intuition-test-")).replace(/\\/g, "/");
+  return canonicalPath(mkdtempSync(join(tmpdir(), "intuition-test-")));
 }
 
 export function cleanup(dir: string): void {
