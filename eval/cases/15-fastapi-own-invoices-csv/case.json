@@ -1,0 +1,24 @@
+{
+  "id": "15-fastapi-own-invoices-csv",
+  "title": "Add 'download my invoices as CSV' (properly scoped to the signed-in customer)",
+  "stack": "Python / FastAPI / SQLAlchemy",
+  "kind": "benign",
+  "mode": "worktree",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "max_false_positives": 1,
+  "also_ok": [
+    {
+      "keywords": [
+        "formula",
+        "spreadsheet",
+        "excel"
+      ]
+    }
+  ],
+  "hook": {
+    "prompt": "Customers keep asking for a spreadsheet of their invoices for their accountant. Add a CSV download of the signed-in customer's own invoices to the invoices API, with a small test. Keep it simple."
+  }
+}

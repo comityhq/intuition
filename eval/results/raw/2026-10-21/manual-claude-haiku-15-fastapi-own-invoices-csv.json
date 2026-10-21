@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-05-719fb3",
+  "created_at": "2026-10-21T19:16:05.180Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/15-fastapi-own-invoices-csv",
+  "base": "855bf98a09ef100933d44d1f15d15b48d0076633",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "Customers can now download their own invoices as a spreadsheet file, and the change only shows each customer their own invoices.",
+  "what_changed": [
+    "Signed-in customers can download a spreadsheet file (CSV) listing their invoices, for example to send to an accountant.",
+    "The file has four columns: invoice number, issue date, total in dollars-and-cents style (for example 199.00), and status (paid, open or void).",
+    "The file downloads under the name invoices.csv.",
+    "The existing invoice list on the customer's account page keeps the same information. Its code was tidied up so both views share one way of finding the invoices.",
+    "A small automated check was added for the new download. It only confirms the file type, not the file's contents."
+  ],
+  "risks": [],
+  "questions_for_developer": [
+    "Are all invoices in one currency? The spreadsheet's Total column shows numbers with no currency sign, so an accountant may need to know which currency it is.",
+    "Should void invoices appear in the download? The list already includes them, and the spreadsheet does too, with status 'void'. This matches the current list, so it is only a question of what customers expect."
+  ],
+  "good_news": [
+    "The download only returns invoices that belong to the customer who is signed in. Each customer's invoices are kept separate from everyone else's.",
+    "Customers who are not signed in are turned away before any invoice data is read.",
+    "The change is small and contained. It adds one new download option and does not change what the existing list shows."
+  ],
+  "files_reviewed": [
+    "app/routes_invoices.py",
+    "tests/test_invoices_csv.py"
+  ],
+  "truncated": false
+}

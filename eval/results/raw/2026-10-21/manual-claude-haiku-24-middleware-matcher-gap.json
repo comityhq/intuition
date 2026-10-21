@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-57-4c10f2",
+  "created_at": "2026-10-21T19:16:57.656Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/24-middleware-matcher-gap",
+  "base": "1df8b64ba4c5cb282247c212b51569aa17f044a7",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "A change removed the sign-in check from the internal revenue data, so anyone can now see customer details.",
+  "what_changed": [
+    "The sign-in check that guarded the internal revenue data was removed for the web address that serves it. Anyone who visits that address without signing in now gets the data.",
+    "The data is a ranked list of every customer's name, email address and total lifetime spending.",
+    "The change also removed the sign-in check's special reply for unsigned requests to that address. Those requests now get sent to the sign-in page instead of a plain error.",
+    "The dashboard page still requires a staff sign-in. Its spelling fix (\"bussiness\" to \"business\") is correct and harmless.",
+    "The change's comment says the app's data pages check sign-in themselves. The revenue page does not, so the comment is wrong for it."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Customer names, emails and spending are now open to anyone",
+      "explanation": "The internal revenue page returns every customer's name, email address and total spending. Its only protection was the sign-in check that this change removed, and the page has no sign-in check of its own. Anyone who finds the web address, which is easy to guess from the app's other addresses, can read the full list without signing in. Do not publish until a sign-in check is restored on that page.",
+      "where": [
+        "middleware.ts",
+        "app/api/internal/revenue/route.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you put the sign-in check back for the internal revenue web address before we publish, and confirm that an unsigned visit is refused?",
+    "Did anyone decide that the revenue page should be public? If not, why does the change say the page handles its own sign-in when it does not?",
+    "Is the staff sign-in check strong enough? It only confirms that a sign-in cookie exists and is longer than 20 characters, so could a visitor fake it?"
+  ],
+  "good_news": [
+    "The change is small and easy to reverse.",
+    "The spelling fix is correct and carries no risk.",
+    "The problem is found before release, so no customer data has been exposed yet."
+  ],
+  "files_reviewed": [
+    "app/dashboard/page.tsx",
+    "middleware.ts"
+  ],
+  "truncated": false
+}

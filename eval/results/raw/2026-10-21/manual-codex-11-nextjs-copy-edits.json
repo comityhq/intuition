@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-07-11-41f8d8",
+  "created_at": "2026-10-21T19:07:11.173Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/11-nextjs-copy-edits",
+  "base": "6b5bb278dd37811ba18846a265e9acf634f30241",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "The update fixes copy errors and makes trial wording clearer across the home and pricing pages.",
+  "what_changed": [
+    "The home page now fixes spelling errors and describes searching scanned pages more clearly.",
+    "Calls to action now say “Start your free trial” on the home and pricing pages.",
+    "The pricing page fixes spelling and clarifies that the free trial lasts 14 days."
+  ],
+  "risks": [],
+  "questions_for_developer": [],
+  "good_news": [
+    "This is a small, contained wording-only change with no effect on prices, payments, customer data, or sign-up links."
+  ],
+  "files_reviewed": [
+    "app/page.tsx",
+    "app/pricing/page.tsx"
+  ],
+  "truncated": false
+}

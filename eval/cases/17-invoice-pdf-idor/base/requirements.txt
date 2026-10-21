@@ -1,0 +1,4 @@
+fastapi==0.115.0
+sqlalchemy==2.0.35
+pytest==8.3.3
+httpx==0.27.2

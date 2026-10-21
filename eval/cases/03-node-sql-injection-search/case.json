@@ -1,0 +1,58 @@
+{
+  "id": "03-node-sql-injection-search",
+  "title": "Product search builds SQL from user input (SQL injection)",
+  "stack": "Node.js / Express / Postgres",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red"
+  ],
+  "must_find": [
+    {
+      "label": "SQL injection in product search/sort",
+      "categories": [
+        "security",
+        "data",
+        "privacy",
+        "legal"
+      ],
+      "files": [
+        "src/routes/products.js"
+      ],
+      "keywords": [
+        "inject",
+        "sql",
+        "attacker",
+        "hack",
+        "own commands",
+        "pasted",
+        "straight into",
+        "unchecked",
+        "without being checked",
+        "read or change",
+        "steal",
+        "malicious",
+        "crafted",
+        "database instructions",
+        "database commands",
+        "control the database",
+        "control database",
+        "damage"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "also_ok": [
+    {
+      "keywords": [
+        "error"
+      ]
+    },
+    {
+      "keywords": [
+        "apostrophe",
+        "quote"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-09-41-cb0b37",
+  "created_at": "2026-10-21T19:09:41.853Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/22-giftcard-dollars-vs-cents",
+  "base": "6e14867e4062193a86e4d5f54720f2d7163c90bb",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The new gift-card checkout can charge cents instead of the advertised dollar amount.",
+  "what_changed": [
+    "Customers can now buy a gift card and receive a redemption code after payment.",
+    "The buyer is charged through the existing card payment service.",
+    "The product guide now mentions gift cards."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Gift cards are undercharged",
+      "explanation": "The payment service expects an amount in cents, but this change sends the gift card’s listed value directly. A $25 gift card could charge only 25 cents. Customers could receive far more value than they paid, causing direct losses. Convert dollar values to cents before charging, or store gift-card prices in cents.",
+      "where": [
+        "src/giftcards/purchase.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Retries can double-charge buyers",
+      "explanation": "The protection against doing the same thing twice uses a newly random code each time. If a customer retries after a slow or failed response, the payment service sees a different purchase and can charge again. Use one stable purchase reference across retries.",
+      "where": [
+        "src/giftcards/purchase.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Where is each issued gift card and its remaining balance saved, so the recipient can redeem the code later?"
+  ],
+  "good_news": [
+    "The payment result is checked before the code is returned."
+  ],
+  "files_reviewed": [
+    "README.md",
+    "src/giftcards/purchase.ts"
+  ],
+  "truncated": false
+}

@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-01-433118",
+  "created_at": "2026-10-21T19:15:01.818Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/04-stripe-double-charge-retry",
+  "base": "7aadb52f387bf0ae0d27c48f7beb17d1a77a3321",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The checkout now retries card charges without a duplicate-protection key, so a customer can be charged twice when the payment provider is slow.",
+  "what_changed": [
+    "When a card payment fails or times out at checkout, the app now tries it again up to four times, waiting a little longer each time.",
+    "The safety key that stops the same payment being taken twice has been removed from the payment request.",
+    "Each payment description now includes the exact time, so no two payment attempts look alike to the payment provider.",
+    "Customers may wait longer at checkout before seeing a result, because every slow attempt can take several seconds before the retry starts.",
+    "Retries also run when the payment provider has declined the card, not only when the connection fails."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Customers can be charged two or more times for one order",
+      "explanation": "The payment request previously carried a key that tells the provider to ignore repeat requests for the same order. That key was removed. If the provider takes the money but the reply is slow or lost, the app times out, retries, and creates a new charge. Customers on a busy day would likely be charged twice, and the order would then show as failed even though the money was taken. Fix by restoring the protection key for each order, and do not retry a payment whose outcome is unknown until its status is checked.",
+      "where": [
+        "src/checkout/placeOrder.ts",
+        "src/lib/retry.ts",
+        "src/payments/gateway.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Declined cards are retried four times",
+      "explanation": "The retry wrapper treats every failure the same, including a card that the bank has refused. Each refused card sends up to four more payment requests. This adds noise to the payment provider's records and can trigger fraud checks or card-issuer warnings against the customer. Retries should only be used for network timeouts and server errors, not for refusals.",
+      "where": [
+        "src/lib/retry.ts",
+        "src/checkout/placeOrder.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "Orders can show as failed after a successful payment",
+      "explanation": "If all retries fail after one attempt actually succeeded, the order is saved as failed while the customer has been charged. Staff would then see a failed order with money taken, and the customer may pay again. Fix by checking the payment status with the provider before marking an order failed.",
+      "where": [
+        "src/checkout/placeOrder.ts"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Why was the payment protection key removed, and can it be restored so that a retried payment cannot create a second charge for the same order?",
+    "Can retries be limited to connection timeouts and server errors, so that a card the bank has refused is not tried again?",
+    "Before marking an order as failed, can the app check with the payment provider whether the payment actually went through?",
+    "How long can a customer wait at checkout in the worst case now, and is that acceptable for the checkout page?"
+  ],
+  "good_news": [
+    "The change is small and limited to the checkout payment step, so it is easy to fix and to undo.",
+    "Retry waits are spaced out rather than firing all at once, which helps a struggling payment provider recover."
+  ],
+  "files_reviewed": [
+    "src/checkout/placeOrder.ts",
+    "src/lib/retry.ts"
+  ],
+  "truncated": false
+}

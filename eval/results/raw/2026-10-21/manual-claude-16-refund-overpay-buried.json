@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-10-db08bf",
+  "created_at": "2026-10-21T19:16:10.964Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/16-refund-overpay-buried",
+  "base": "b679d36e48e2e66bec8fab354b8a733ca2a79249",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Partial refunds were added, but the safety checks against refunding more than the member paid were removed. Don't ship yet.",
+  "what_changed": [
+    "Support agents can now refund part of an order, such as one missed class, by typing an amount. Leaving the amount empty refunds whatever is left.",
+    "The refund button now says \"Refund\" instead of \"Refund order\". A new label explains the amount box.",
+    "The \"refund sent\" and \"order not found\" messages were reworded to be clearer.",
+    "The internal refund log now shows amounts in dollars (e.g. \"$19.99\") instead of raw cents.",
+    "The README gained a short section on refunds. A small formatting helper was tidied up but works the same."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Agents can refund more than the member paid",
+      "explanation": "Before, the system refused to refund an order that was already fully refunded. That check was deleted, and the typed amount is never compared with what is left. An agent could refund $50 on a $20 order, refund the same order twice, or enter a zero or negative amount. Before shipping, ask the developer to reject any amount that is zero, negative, or more than the money still unrefunded.",
+      "where": [
+        "src/refunds/refund.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Double-clicking Refund can now send two refunds",
+      "explanation": "Each refund carries a tag that tells the card processor \"this is the same request, don't do it twice\". The old tag was the same every time for a given order, so repeat clicks or retries were ignored. The new tag includes the current time, so every click looks like a brand-new refund. A double-click, slow network retry, or two agents working the same ticket could pay the member twice. The developer should use a tag that stays the same for the same refund attempt.",
+      "where": [
+        "src/refunds/refund.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "data",
+      "title": "Refund records can show more refunded than paid",
+      "explanation": "Because nothing caps the amount, the order record can end up saying more was refunded than was paid. The \"refund the rest\" option would then calculate a negative amount. This makes the books wrong and can confuse later refunds or reports. Fixing the amount check above also fixes this.",
+      "where": [
+        "src/refunds/refund.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you add a check that blocks any refund that is zero, negative, or bigger than the amount still left to refund on the order?",
+    "Can you bring back protection against sending the same refund twice (for example if an agent double-clicks), instead of tagging each refund with the current time?",
+    "Does our card processor itself block refunds above the original charge, or are we relying only on our own app for that?",
+    "Can we add a few tests for partial refunds: two partial refunds in a row, an amount too large, and refunding an already fully refunded order?"
+  ],
+  "good_news": [
+    "The change is small and limited to the refund feature, so it's quick to fix.",
+    "The text changes for support staff are clearer and set more accurate expectations (\"business days\").",
+    "The log now shows refund amounts in a readable dollar format and still records which agent made the refund."
+  ],
+  "files_reviewed": [
+    "README.md",
+    "src/format.ts",
+    "src/refunds/refund.ts",
+    "src/ui/strings.ts"
+  ],
+  "truncated": false
+}

@@ -1,0 +1,91 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-51-da2fd3",
+  "created_at": "2026-10-21T19:15:51.346Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/09-llm-unbounded-cost",
+  "base": "c2a22d003a49adef1316b9d4ec226cb86ea746c3",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "New AI ticket summaries would re-summarize every ticket, every minute, likely costing a fortune and overloading the system. Don't ship yet.",
+  "what_changed": [
+    "Adds a background job that sends each support ticket's full conversation to OpenAI (a paid AI service) and saves a short summary for the inbox preview.",
+    "Schedules this job to run every minute, all day, every day.",
+    "Each run covers every ticket ever created, including closed ones, not just new or changed tickets.",
+    "If a summary is longer than about 280 characters, the job asks the AI to shorten it again, with no limit on how many times it tries.",
+    "If the AI service returns an error, the job retries straight away, forever, with no pause."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "cost",
+      "title": "Every ticket is sent to paid AI every minute",
+      "explanation": "The inbox has about 40,000 open tickets, plus every closed one. All of them are re-summarized every minute, even when nothing has changed. That adds up to tens of millions of paid AI requests a day and could easily run into thousands of dollars daily. Only summarize tickets that are new or have new messages, and run it far less often.",
+      "where": [
+        "src/scheduler.js",
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "reliability",
+      "title": "Errors cause endless, instant retries",
+      "explanation": "When the AI service fails or says 'slow down', the job tries again immediately, forever, with no wait and no limit. During an outage or rate limit, this hammers the service, keeps the worker busy, and can rack up more charges. Add a short pause between retries, a maximum number of attempts, and let a ticket simply fail until the next run.",
+      "where": [
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "reliability",
+      "title": "All tickets processed at once, and runs pile up",
+      "explanation": "The job fires off requests for every ticket at the same moment, which will hit the AI service's limits and strain the database. A full run cannot finish within one minute, so a new run starts on top of the old one, again and again. This can slow or crash the worker that also closes stale tickets. Process tickets in small batches and stop a new run starting while one is still going.",
+      "where": [
+        "src/jobs/summarizeTickets.js",
+        "src/scheduler.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "privacy",
+      "title": "Customer conversations now shared with OpenAI",
+      "explanation": "Full support conversations, which may include names, emails or other personal details, are now sent to an outside company. Your customer contracts or privacy policy may need to list OpenAI as a data processor. Confirm this is allowed before turning it on.",
+      "where": [
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "cost",
+      "title": "Shortening step can loop with no limit",
+      "explanation": "If the AI keeps returning summaries over 280 characters, the job keeps asking it to shorten them, with no cap. Very long conversations are also sent in full, which costs more and can be rejected for being too large, triggering the endless retry above. Cap the number of shortening attempts and trim very long conversations first.",
+      "where": [
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can the job only summarize tickets that are new or got a new message since their last summary, and skip closed tickets?",
+    "How often do inbox previews really need refreshing? Could it run every 15 minutes or hourly instead of every minute?",
+    "Can we add a spending limit on the OpenAI account and a cap on retries, with a pause between them, so a failure can't run up a big bill?",
+    "Do our privacy policy and customer agreements allow sending support conversations to OpenAI, and should we remove personal details first?"
+  ],
+  "good_news": [
+    "The change is small and kept to one new job, so it is easy to fix or switch off.",
+    "Summaries are saved to the database in a safe way that keeps the data separate from the database instructions."
+  ],
+  "files_reviewed": [
+    "src/jobs/summarizeTickets.js",
+    "src/scheduler.js"
+  ],
+  "truncated": false
+}

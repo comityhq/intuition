@@ -1,0 +1,45 @@
+name: Bug report
+description: Something isn't working
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. npx comity-intuition init
+        2. Asked Claude Code to ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: doctor
+    attributes:
+      label: Output of `comity-intuition doctor`
+      render: text
+  - type: textarea
+    id: log
+    attributes:
+      label: Relevant lines from `.intuition/hook.log` (remove anything private)
+      render: text
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent
+      options: [Claude Code, Codex, Gemini CLI, Other]
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: OS, Node version, agent version
+      placeholder: Windows 11, Node 22.12, Claude Code 2.x
+    validations:
+      required: true

@@ -1,0 +1,52 @@
+{
+  "id": "06-nextjs-secret-key-committed",
+  "title": "Live payment secret key hard-coded and .env.production committed",
+  "stack": "Next.js (App Router) / TypeScript",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red"
+  ],
+  "must_find": [
+    {
+      "label": "live secret key committed to the code",
+      "categories": [
+        "security",
+        "money"
+      ],
+      "files": [
+        "lib/stripe.ts",
+        ".env.production",
+        ".gitignore"
+      ],
+      "keywords": [
+        "secret",
+        "key",
+        "sk_live",
+        "committed",
+        "exposed",
+        "leak",
+        "password",
+        "credential"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "also_ok": [
+    {
+      "keywords": [
+        "preview",
+        "real money",
+        "real charges",
+        "test"
+      ]
+    },
+    {
+      "keywords": [
+        ".gitignore",
+        "ignore",
+        "env"
+      ]
+    }
+  ]
+}

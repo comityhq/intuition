@@ -1,0 +1,51 @@
+{
+  "id": "26-free-shipping-default-flip",
+  "title": "Config refactor inverts the free-shipping flag: free shipping for everyone unless explicitly turned off",
+  "stack": "Node.js shop",
+  "kind": "red",
+  "mode": "worktree",
+  "difficulty": "hard",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "free shipping is now on by default (env var not set in production) so every order ships free",
+      "categories": [
+        "money",
+        "reliability",
+        "other"
+      ],
+      "files": [
+        "src/config.js",
+        "src/cart/shipping.js"
+      ],
+      "keywords": [
+        "free shipping",
+        "default",
+        "every order",
+        "all orders",
+        "unless",
+        "not set",
+        "turned on",
+        "switched on",
+        "everyone"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "port",
+        "currency"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

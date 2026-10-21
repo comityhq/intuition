@@ -1,0 +1,66 @@
+{
+  "id": "08-fastapi-pii-logging",
+  "title": "Debug middleware logs full request bodies (SSN, card numbers) to a third-party log service",
+  "stack": "Python / FastAPI",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "personal/payment data written to logs (shipped to log provider)",
+      "categories": [
+        "privacy",
+        "security",
+        "legal"
+      ],
+      "files": [
+        "app/middleware/request_logging.py",
+        "app/main.py",
+        "app/logging_config.py"
+      ],
+      "keywords": [
+        "log",
+        "social security",
+        "ssn",
+        "card",
+        "bank",
+        "personal",
+        "sensitive",
+        "pii",
+        "cookie",
+        "header",
+        "password",
+        "token",
+        "identity"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "also_ok": [
+    {
+      "keywords": [
+        "slow",
+        "performance",
+        "memory",
+        "large",
+        "big"
+      ]
+    },
+    {
+      "keywords": [
+        "cost",
+        "bill",
+        "volume"
+      ]
+    },
+    {
+      "keywords": [
+        "response",
+        "status"
+      ]
+    }
+  ]
+}

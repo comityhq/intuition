@@ -1,0 +1,4 @@
+sqlalchemy==2.0.35
+alembic==1.13.3
+psycopg[binary]==3.2.3
+twilio==9.3.3

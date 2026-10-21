@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-00-8a2dff",
+  "created_at": "2026-10-21T19:15:00.943Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/03-node-sql-injection-search",
+  "base": "72cd86175e5c26aef7c2fdc14296f7f45182cc8a",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The product search change lets anyone on the internet run their own database instructions; do not ship it.",
+  "what_changed": [
+    "The product search now has a category filter, so shoppers can narrow results to one type of product.",
+    "Search results now show each product's category.",
+    "Search results can be sorted by a chosen field. If no choice is made, they sort by name.",
+    "When a search fails, the app now shows the error and the internal database instructions it tried to run.",
+    "The change was requested by the design team. It affects the search box that the public uses."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "security",
+      "title": "Anyone can read or change the database through the search box",
+      "explanation": "The search now places what a visitor types directly into the database instructions, with no protection. A person can type specially crafted text to pull out data from other tables, including the customers table, or to change or delete records. The search is open to the public, so this needs no login. This is very likely to be found and used, because the flaw is easy to spot. Ask a developer to restore the protected version of this search, keep typed values separate from the instructions, and allow only a fixed list of sort and category choices.",
+      "where": [
+        "src/routes/products.js",
+        "src/index.js",
+        "db/schema.sql"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "privacy",
+      "title": "Failed searches reveal internal database instructions to visitors",
+      "explanation": "When a search fails, the response includes the exact database instructions that were run, along with the error text. This shows outsiders how the database is organised and makes attacks easier. Customer records could be exposed more easily as a result. Ask the developer to return a plain error message with no internal details.",
+      "where": [
+        "src/routes/products.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you restore the protected version of the product search, so that typed search text and category values are kept separate from the database instructions?",
+    "Can you limit the sort option to a fixed list of allowed fields, and reject anything else?",
+    "Can you remove the internal database instructions from the error response, so visitors only see a plain error message?",
+    "Can you test the search with special characters and with attack text before we publish, and show us the results?",
+    "Which database account does the app use, and does it have rights beyond reading products? If so, can those rights be reduced?"
+  ],
+  "good_news": [
+    "The change is small and limited to one file.",
+    "The category field exists in the database layout, so the new category display should work once the security issue is fixed.",
+    "The product detail lookup still uses the protected method, so it is not affected by this problem."
+  ],
+  "files_reviewed": [
+    "src/routes/products.js"
+  ],
+  "truncated": false
+}

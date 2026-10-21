@@ -1,0 +1,68 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-24-5d879e",
+  "created_at": "2026-10-21T19:15:24.623Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/05-sql-migration-drop-used-column",
+  "base": "23d442cc6d75c34f31052c6b84ade543c51fa182",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "This change deletes every patient's phone number from the database, but the appointment text reminders still need those numbers, so they will stop working.",
+  "what_changed": [
+    "The phone number column is removed from the user records in the database. Every stored phone number is erased when this is published.",
+    "The app's description of a user no longer includes a phone number.",
+    "A note says the numbers have moved to a new customer system (ticket CL-212). Nothing in this code reads numbers from that new system."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "reliability",
+      "title": "Appointment text reminders will stop sending entirely",
+      "explanation": "The reminder job texts patients 24 hours before their appointment, and it still looks up each patient's phone number. That number no longer exists, so the job will crash on the first patient who has opted in. No reminders go out, which likely means more missed appointments. Keep the phone number until the reminder job reads numbers from the new customer system.",
+      "where": [
+        "app/reminders/sms.py",
+        "app/models.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "data",
+      "title": "All phone numbers erased with no way to undo",
+      "explanation": "Publishing this permanently deletes every patient's phone number. The 'undo' step for this database change is empty, so it cannot bring the numbers back. Unless someone has confirmed every number really is in the new customer system and a backup exists, this data is lost. Confirm the copy is complete before you publish.",
+      "where": [
+        "migrations/versions/20261014_drop_user_phone.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "users",
+      "title": "Phone number updates from patients silently thrown away",
+      "explanation": "The screen where patients update their contact details still accepts a phone number. After this change, the number is quietly ignored and never saved anywhere, and no error is shown. Patients will think they updated their number when they did not. Either remove the phone field there or send it to the new customer system.",
+      "where": [
+        "app/profile.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "The appointment text reminders still read the patient's phone number from our database. How will they get numbers after this change? Can we hold this change until they read from the new customer system?",
+    "Has someone confirmed that every phone number is already in the new customer system (ticket CL-212)? Do we have a backup taken before this runs?",
+    "The 'undo' step for this database change does nothing. Can it at least re-create the empty phone column, so the app can be rolled back?",
+    "What should happen when a patient changes their phone number on the contact details screen now? Right now it would be silently ignored."
+  ],
+  "good_news": [
+    "The change is small and easy to hold back. Nothing has been published yet, so no data has been lost.",
+    "The reminder code still checks each patient's text-message opt-in, so consent handling itself was not weakened."
+  ],
+  "files_reviewed": [
+    "app/models.py",
+    "migrations/versions/20261014_drop_user_phone.py"
+  ],
+  "truncated": false
+}

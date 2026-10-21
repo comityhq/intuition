@@ -1,0 +1,38 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-45-7096ae",
+  "created_at": "2026-10-21T19:15:45.021Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/12-python-refactor-invoices",
+  "base": "d38888dbda10d3811e47fdc3bf7424a651358d49",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "The invoice text layout is tidied up with no change to what customers see.",
+  "what_changed": [
+    "Invoice text should look the same as before. The same amounts, symbols and totals are produced.",
+    "Money formatting now lives in one shared place, so every invoice amount is formatted the same way.",
+    "Currency symbols still work as before: dollars, euros and pounds show their symbol, and other currencies show their short code, such as CHF 12.00.",
+    "A small new automated check was added for the money formatting, covering dollars, euros and an unknown currency.",
+    "Internal change only: the line-item helper now needs the currency passed in. The only other code that uses invoice text does not call that helper directly, so nothing else breaks."
+  ],
+  "risks": [],
+  "questions_for_developer": [
+    "Did the full test suite pass on this branch, including the existing invoice text test? I only read the code and did not run anything.",
+    "Is there any other part of the product, such as a PDF export or an email, that builds invoice lines on its own and might rely on the old helper's behaviour?"
+  ],
+  "good_news": [
+    "The change is small and contained, and it only moves existing logic into one place.",
+    "The existing invoice text test covers the main output, and the amounts it checks match the old behaviour.",
+    "Rounding is handled the same way as before, so totals should not shift by a cent."
+  ],
+  "files_reviewed": [
+    "invoices/money.py",
+    "invoices/render.py",
+    "tests/test_money.py"
+  ],
+  "truncated": false
+}

@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-30-624b89",
+  "created_at": "2026-10-21T19:15:30.519Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/08-fastapi-pii-logging",
+  "base": "06cbc48cb55d2e31e589d1788607e3165dfb433d",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "This change records every web request in full, including applicants' SSNs and bank account numbers, and sends them to an outside log service.",
+  "what_changed": [
+    "Every request the app receives is now written to the logs, with its full contents and its sender's login details.",
+    "The loan application form's submissions are included, so each applicant's Social Security number, date of birth, bank account number and routing number would be logged.",
+    "The app's logs go to Logtail, an outside log search service that keeps them for 30 days, so this sensitive information would leave your systems.",
+    "The change is small: two new lines plus one new file. It was made to help debug the failed applications problem."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Applicants' SSNs and bank details sent to a third-party log service",
+      "explanation": "Each loan application's full contents, including Social Security number, date of birth, bank account number and routing number, would be written to the logs. The app's existing setup sends every log entry to Logtail, an outside service that keeps them for 30 days. Every applicant would be affected, starting with the next application submitted. This likely breaks privacy promises to applicants and may breach data protection rules and contracts. Remove the full-body logging before release, and check whether any sensitive data has already reached Logtail.",
+      "where": [
+        "app/middleware/request_logging.py",
+        "app/main.py",
+        "app/logging_config.py",
+        "app/routes/applications.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "security",
+      "title": "Login details written to logs",
+      "explanation": "The change logs every request's headers. These can include login tokens and session cookies. Anyone who can read the logs, including people at Logtail, could reuse those details to act as a logged-in customer or staff member. Log only the method, the web address, the status and the timing.",
+      "where": [
+        "app/middleware/request_logging.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "Application submissions may hang or arrive empty",
+      "explanation": "The new code reads the full request body before passing it on to the application form handler. In this FastAPI and Starlette setup, that can leave the handler with an empty or stalled body. If so, customers submitting loan applications could see failures, which matches the failed-applications problem this was meant to debug. This is unverified because no test was run. Test one submission on a staging copy before release.",
+      "where": [
+        "app/middleware/request_logging.py",
+        "requirements.txt"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can the request logging be limited to the method, the web address, the status code and the time taken, with no body and no headers?",
+    "Has anyone checked what has already been sent to Logtail since this code was added? If it has not run in production yet, can we confirm that?",
+    "Does our Logtail contract allow storing Social Security numbers and bank details? If not, which logs must be cleaned up?",
+    "Can you submit a test loan application on a staging copy and confirm the handler still receives the full form data?"
+  ],
+  "good_news": [
+    "The change is small and easy to undo: remove two lines in the app's main file and delete the new file.",
+    "The loan application handler itself is unchanged, so the logic that processes applications is not affected by this change."
+  ],
+  "files_reviewed": [
+    "app/main.py",
+    "app/middleware/__init__.py",
+    "app/middleware/request_logging.py"
+  ],
+  "truncated": false
+}

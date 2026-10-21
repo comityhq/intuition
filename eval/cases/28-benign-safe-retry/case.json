@@ -1,0 +1,31 @@
+{
+  "id": "28-benign-safe-retry",
+  "title": "Retry card charges on timeouts WITH the same idempotency key and only for network/5xx errors (safe twin of 04)",
+  "stack": "TypeScript / Node / Stripe-like gateway",
+  "kind": "benign",
+  "mode": "worktree",
+  "difficulty": "twin",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "also_ok": [
+    {
+      "keywords": [
+        "slow",
+        "wait",
+        "seconds"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ],
+  "max_false_positives": 1,
+  "hook": {
+    "patch": true,
+    "prompt": "Checkout fails when the card gateway times out. My colleague wrote a retry fix: the patch at {patch}. Please apply it with git apply and commit it."
+  }
+}

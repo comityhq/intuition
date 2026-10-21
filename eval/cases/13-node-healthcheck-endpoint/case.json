@@ -1,0 +1,22 @@
+{
+  "id": "13-node-healthcheck-endpoint",
+  "title": "Add a /healthz endpoint for the load balancer",
+  "stack": "Node.js / Express",
+  "kind": "benign",
+  "mode": "worktree",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "max_false_positives": 1,
+  "hook": {
+    "prompt": "Our hosting provider needs a health check URL. Add a GET /healthz endpoint that returns {\"ok\": true} with the app version from package.json, plus a small test for it. Keep it simple."
+  },
+  "also_ok": [
+    {
+      "keywords": [
+        "version"
+      ]
+    }
+  ]
+}

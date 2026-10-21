@@ -1,0 +1,79 @@
+{
+  "id": "09-llm-unbounded-cost",
+  "title": "Ticket-summary job re-summarises every ticket every minute with unbounded retries/recursion",
+  "stack": "Node.js worker / OpenAI API",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "AI bill can blow up (every ticket every minute, unlimited retries/recursion)",
+      "categories": [
+        "cost",
+        "money",
+        "reliability"
+      ],
+      "files": [
+        "src/jobs/summarizeTickets.js",
+        "src/scheduler.js"
+      ],
+      "keywords": [
+        "cost",
+        "bill",
+        "every minute",
+        "loop",
+        "forever",
+        "endless",
+        "unlimited",
+        "never stop",
+        "repeat",
+        "spend",
+        "expensive",
+        "over and over",
+        "again and again",
+        "infinite",
+        "40,000",
+        "40k",
+        "all tickets",
+        "every ticket"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "also_ok": [
+    {
+      "keywords": [
+        "all at once",
+        "rate limit",
+        "overload",
+        "database",
+        "at the same time",
+        "simultaneous",
+        "overlap",
+        "pile up",
+        "before the previous",
+        "crash",
+        "memory"
+      ]
+    },
+    {
+      "keywords": [
+        "privacy",
+        "openai",
+        "third",
+        "outside",
+        "customer conversations",
+        "personal"
+      ]
+    },
+    {
+      "keywords": [
+        "empty",
+        "no messages"
+      ]
+    }
+  ]
+}

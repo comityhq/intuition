@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-10-03-e358ad",
+  "created_at": "2026-10-21T19:10:03.410Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/24-middleware-matcher-gap",
+  "base": "1df8b64ba4c5cb282247c212b51569aa17f044a7",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "yellow",
+  "headline": "The dashboard wording is corrected, but internal staff connections no longer receive the shared sign-in check.",
+  "what_changed": [
+    "The dashboard now uses the correct spelling of “business.”",
+    "Visitors without a staff sign-in are still sent to the sign-in page from the dashboard.",
+    "Internal staff connections are no longer protected by this shared sign-in check; they must each protect themselves."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "security",
+      "title": "Internal staff access may be exposed",
+      "explanation": "This change removes the shared sign-in check from every internal staff connection. If even one of those connections lacks its own check, an unsigned-in visitor could read or change staff-only information. Confirm every internal staff connection blocks unsigned-in visitors before publishing.",
+      "where": [
+        "middleware.ts"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Please list every internal staff connection and confirm where each one checks that the visitor has a staff sign-in before allowing access."
+  ],
+  "good_news": [
+    "The visible dashboard change is a spelling correction only.",
+    "The dashboard remains behind the staff sign-in screen."
+  ],
+  "files_reviewed": [
+    "app/dashboard/page.tsx",
+    "middleware.ts"
+  ],
+  "truncated": false
+}

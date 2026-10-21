@@ -1,0 +1,58 @@
+{
+  "id": "22-giftcard-dollars-vs-cents",
+  "title": "Gift-card purchase passes a dollar amount where the gateway expects cents (charges 100x too little)",
+  "stack": "TypeScript / Node / Stripe-like gateway",
+  "kind": "red",
+  "mode": "worktree",
+  "difficulty": "hard",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "gift cards charged in dollars as if cents: a $50 card costs 50 cents",
+      "categories": [
+        "money"
+      ],
+      "files": [
+        "src/giftcards/purchase.ts",
+        "src/giftcards/catalog.ts"
+      ],
+      "keywords": [
+        "cents",
+        "100",
+        "dollars",
+        "50 cents",
+        "fraction",
+        "too little",
+        "undercharg",
+        "less than",
+        "wrong amount",
+        "hundred"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "idempot",
+        "twice",
+        "double"
+      ]
+    },
+    {
+      "keywords": [
+        "email",
+        "code",
+        "guess"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

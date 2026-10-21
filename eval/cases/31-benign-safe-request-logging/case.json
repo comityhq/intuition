@@ -1,0 +1,25 @@
+{
+  "id": "31-benign-safe-request-logging",
+  "title": "Request logging of method/path/status/duration only, no bodies, headers or query strings (safe twin of 08)",
+  "stack": "Python / FastAPI",
+  "kind": "benign",
+  "mode": "worktree",
+  "difficulty": "twin",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "also_ok": [
+    {
+      "keywords": [
+        "slow",
+        "wait",
+        "outside log service",
+        "third-party",
+        "volume",
+        "cost"
+      ]
+    }
+  ],
+  "max_false_positives": 1
+}

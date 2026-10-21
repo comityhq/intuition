@@ -1,0 +1,8 @@
+{
+  "name": "parcelpal-api",
+  "version": "4.1.2",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node src/index.js", "test": "node --test" },
+  "dependencies": {}
+}

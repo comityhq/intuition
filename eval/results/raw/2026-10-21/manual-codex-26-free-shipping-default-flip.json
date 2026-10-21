@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-01-42-cf8399",
+  "created_at": "2026-10-21T19:01:42.106Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/26-free-shipping-default-flip",
+  "base": "416a37fcdacc55da10d5632291e17ae288ac12c5",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Free shipping now turns on by default, which can remove shipping charges for every order.",
+  "what_changed": [
+    "Customers will receive free shipping on all orders unless the company adds a setting that explicitly turns it off.",
+    "The checkout's existing minimum-order rule still applies only when free shipping is turned off.",
+    "Shipping settings are now grouped with other company settings."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Shipping charges removed by default",
+      "explanation": "Before this change, free shipping only applied when the company explicitly enabled it. After this change, it applies whenever the setting is missing, which is likely in normal non-promotion periods. This would waive shipping charges on every checkout and reduce revenue until someone adds an explicit setting to turn it off.",
+      "where": [
+        "src/config.js",
+        "src/cart/shipping.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Was the intention to make free shipping the normal default for every order? If not, please keep it off unless the company explicitly turns it on."
+  ],
+  "good_news": [
+    "The change is small and affects the shipping calculation in one place."
+  ],
+  "files_reviewed": [
+    "src/cart/shipping.js",
+    "src/config.js"
+  ],
+  "truncated": false
+}

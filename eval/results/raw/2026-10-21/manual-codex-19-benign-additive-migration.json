@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-09-21-12f713",
+  "created_at": "2026-10-21T19:09:21.025Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/19-benign-additive-migration",
+  "base": "23d442cc6d75c34f31052c6b84ade543c51fa182",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "The app adds an optional newsletter choice that starts turned off for every patient.",
+  "what_changed": [
+    "Patients can choose whether they want the clinic newsletter from their profile.",
+    "Existing and new patient records start with newsletter messages turned off.",
+    "The database is updated to save each patient's newsletter choice."
+  ],
+  "risks": [
+    {
+      "level": "low",
+      "category": "data",
+      "title": "Undoing release loses choices",
+      "explanation": "If the team publishes this change, patients set their choices, and then undoes the release, the database change removes those saved choices. This only affects a rollback, but it would lose newly collected preference data. Export those choices before undoing the release, if a rollback becomes necessary.",
+      "where": [
+        "migrations/versions/20261015_add_marketing_opt_in.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Where will the newsletter-sending process check this new choice before sending an email, and will it also honor any existing unsubscribe records?",
+    "How does the profile screen ensure a patient can change only their own newsletter choice?"
+  ],
+  "good_news": [
+    "Newsletter messages are off by default, including for existing patients.",
+    "The change is small and does not alter appointments, payments, or contact details."
+  ],
+  "files_reviewed": [
+    "app/models.py",
+    "app/profile.py",
+    "migrations/versions/20261015_add_marketing_opt_in.py"
+  ],
+  "truncated": false
+}

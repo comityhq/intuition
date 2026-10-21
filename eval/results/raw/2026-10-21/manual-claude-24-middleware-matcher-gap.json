@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-46-32caac",
+  "created_at": "2026-10-21T19:16:46.935Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/24-middleware-matcher-gap",
+  "base": "1df8b64ba4c5cb282247c212b51569aa17f044a7",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "A typo was fixed on the dashboard, but the staff-only customer revenue list is now open to anyone on the internet.",
+  "what_changed": [
+    "The dashboard text now reads \"business\" instead of \"bussiness\".",
+    "The sign-in check that runs before pages load now covers only the dashboard pages.",
+    "Internal data web addresses (under \"/api/internal/\") no longer go through that sign-in check. The note added says these addresses \"handle their own auth\", but the only one that exists does not.",
+    "Before, a signed-out visitor asking for internal data got a \"Sign in required\" error. Now they get the data."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Every customer's name, email and spending now public",
+      "explanation": "The internal revenue address returns every customer's name, email address and lifetime spend. It relied completely on the central sign-in check, which this change removed for it, and it has no check of its own. Anyone who finds or guesses the address can download your whole customer list with no login. This is a likely data breach that may need reporting under privacy laws such as GDPR. Do not ship; either restore the old sign-in coverage or add a staff sign-in check inside this address first.",
+      "where": [
+        "middleware.ts",
+        "app/api/internal/revenue/route.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "The internal revenue address has no sign-in check of its own. It even has a note saying it is protected by the central check you removed. Can you put \"/api/internal/\" back under the central sign-in check, or add a staff check inside it, before we publish?",
+    "Why was the internal data area taken out of the central sign-in check? Which internal addresses did you confirm check sign-in themselves?",
+    "Can we add an automatic test that asks for internal data while signed out and makes sure it is refused?"
+  ],
+  "good_news": [
+    "The spelling fix on the dashboard is correct and harmless.",
+    "Dashboard pages still send signed-out visitors to the login page."
+  ],
+  "files_reviewed": [
+    "app/dashboard/page.tsx",
+    "middleware.ts"
+  ],
+  "truncated": false
+}

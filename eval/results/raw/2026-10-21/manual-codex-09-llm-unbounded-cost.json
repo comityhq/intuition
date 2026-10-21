@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-07-37-a6602a",
+  "created_at": "2026-10-21T19:07:37.725Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/09-llm-unbounded-cost",
+  "base": "c2a22d003a49adef1316b9d4ec226cb86ea746c3",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The new inbox summaries send every support ticket to a paid AI service every minute, creating uncontrolled cost and privacy exposure.",
+  "what_changed": [
+    "The inbox can now show short summaries of support conversations.",
+    "Every existing support ticket is re-summarized once per minute, not only when its conversation changes.",
+    "Each support conversation is sent to an outside AI provider to create its preview."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "cost",
+      "title": "AI spending can grow without limit",
+      "explanation": "Every minute, the change sends every ticket to a paid AI service. As ticket history grows, costs grow continuously even when no customer has written anything new. Failed requests retry forever, and long summaries trigger extra requests, so an outage or unexpected response can increase spending further. Do not ship until this runs only for changed tickets and has firm spending, retry, and concurrency limits.",
+      "where": [
+        "src/jobs/summarizeTickets.js",
+        "src/scheduler.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "All support conversations leave the company",
+      "explanation": "The change sends the full text of every support conversation to an outside AI provider once per minute. Support messages can contain names, contact details, account information, or sensitive complaints. Confirm this sharing is covered by the company’s privacy commitments and provider agreement, and limit or remove sensitive information before sending it.",
+      "where": [
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "Repeated jobs may pile up",
+      "explanation": "A new run starts every minute even if the previous run is still processing many tickets. Each run starts work for every ticket at once, which can overload the database or AI provider and make summaries fall behind. Prevent overlapping runs and process a controlled number of tickets at a time.",
+      "where": [
+        "src/jobs/summarizeTickets.js",
+        "src/scheduler.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "What limit will stop AI spending if requests fail, responses remain too long, or ticket volume rises?",
+    "Can we summarize only tickets that changed since their last summary, instead of every ticket every minute?",
+    "Has the company approved sending all support conversations, including possible personal information, to this AI provider?"
+  ],
+  "good_news": [
+    "The database update keeps each summary linked to its correct ticket."
+  ],
+  "files_reviewed": [
+    "src/jobs/summarizeTickets.js",
+    "src/scheduler.js"
+  ],
+  "truncated": false
+}

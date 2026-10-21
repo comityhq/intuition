@@ -1,0 +1,36 @@
+{
+  "version": 1,
+  "id": "2026-10-21T18-27-24-ad5d71",
+  "created_at": "2026-10-21T18:27:24.225Z",
+  "repo": "/Users/founder/tiny-shop",
+  "base": "552497cd4dba20467a34b4a5a1b4d8877a9de083",
+  "head": "0c046b73841fc411af39b28bf1290c75c22460ee",
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": "894da2a2-8bdb-4e61-b8f5-b51df037cb5e"
+  },
+  "verdict": "green",
+  "headline": "The README now has a short \"Running locally\" section explaining how to start the shop and run its tests. It's documentation only and safe to ship.",
+  "what_changed": [
+    "Added a \"Running locally\" section to the README, the project's front-page instructions for developers.",
+    "It explains how to start the shop's server, which runs on port 3000 (the local web address it uses) unless a different port is set.",
+    "It explains how to run the automated tests.",
+    "It notes there is nothing to install apart from Node.js (the program that runs the shop's code).",
+    "The shop itself, customers and checkout are unaffected. The work was saved on its own branch (a separate copy of the code). It was not published or turned into a PR (a request to merge the change) because the project has no online copy set up yet."
+  ],
+  "risks": [],
+  "questions_for_developer": [
+    "Should the README also say which minimum version of Node.js is needed? The built-in test runner only exists in fairly recent versions.",
+    "Where should this repository live online (for example GitHub) so this branch can be published and opened as a pull request?"
+  ],
+  "good_news": [
+    "The instructions match the project. The start and test commands, the default port 3000 and the option to change the port were all checked against the code.",
+    "The change is limited to documentation and doesn't touch any code customers use.",
+    "The existing tests still pass."
+  ],
+  "files_reviewed": [
+    "README.md"
+  ],
+  "truncated": false
+}

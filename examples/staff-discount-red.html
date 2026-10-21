@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>Don&#39;t ship yet: The staff discount and $5 international shipping both work, but anyone can claim to be staff and get 50% off, so don&#39;t ship yet.</title>
+<style>
+:root{--bg:#0b0d12;--panel:#12151c;--panel2:#171b24;--line:#232836;--text:#e8ebf2;--muted:#9aa3b5;--accent:#8ec5ff;--green:#3ecf8e;--amber:#f5b942;--red:#ff6b6b}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,"Helvetica Neue",Arial,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:820px;margin:0 auto;padding:40px 24px 56px}
+.brand{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.brand b{color:var(--accent);font-weight:600}
+.dot{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px var(--accent)}
+.meta{color:var(--muted);font-size:14px;margin-top:6px}
+.hero{margin-top:28px;padding:28px;border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,var(--panel2),var(--panel));position:relative;overflow:hidden}
+.hero:before{content:"";position:absolute;inset:0 auto 0 0;width:5px;background:var(--v)}
+.pill{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;border-radius:999px;font-weight:650;font-size:14px;color:var(--v);background:color-mix(in srgb,var(--v) 14%,transparent);border:1px solid color-mix(in srgb,var(--v) 40%,transparent)}
+.pill i{width:9px;height:9px;border-radius:50%;background:var(--v)}
+h1{font-size:27px;line-height:1.3;margin:16px 0 0;font-weight:700;letter-spacing:-.01em}
+h2{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:40px 0 14px;font-weight:650}
+ul.changes{margin:0;padding:0;list-style:none}
+ul.changes li{padding:10px 0 10px 26px;border-bottom:1px solid var(--line);position:relative}
+ul.changes li:before{content:"";position:absolute;left:4px;top:20px;width:8px;height:8px;border-radius:2px;background:var(--accent);opacity:.8}
+.risk{border:1px solid var(--line);background:var(--panel);border-radius:14px;padding:18px 20px;margin:0 0 12px;border-left:4px solid var(--l)}
+.risk h3{margin:0 0 6px;font-size:17px;line-height:1.4}
+.tags{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.tag{font-size:12px;padding:2px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.tag.level{color:var(--l);border-color:color-mix(in srgb,var(--l) 45%,transparent);background:color-mix(in srgb,var(--l) 12%,transparent);font-weight:600}
+.risk p{margin:0;color:#d5dae5}
+.where{margin-top:10px;font-size:13px;color:var(--muted)}
+code{font-family:ui-monospace,SFMono-Regular,Consolas,Menlo,monospace;font-size:12.5px;background:var(--panel2);border:1px solid var(--line);border-radius:6px;padding:1px 6px;color:#cfe5ff}
+.none{padding:18px 20px;border:1px dashed var(--line);border-radius:14px;color:var(--muted)}
+ol.qs{margin:0;padding:0;list-style:none;counter-reset:q}
+ol.qs li{counter-increment:q;padding:14px 16px 14px 52px;position:relative;background:var(--panel);border:1px solid var(--line);border-radius:12px;margin-bottom:10px}
+ol.qs li:before{content:counter(q);position:absolute;left:16px;top:13px;width:24px;height:24px;border-radius:50%;background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);font-size:13px;font-weight:700;display:grid;place-items:center}
+ul.good{margin:0;padding:0;list-style:none}
+ul.good li{padding:6px 0 6px 26px;position:relative;color:#d5dae5}
+ul.good li:before{content:"✓";position:absolute;left:4px;color:var(--accent);font-weight:700}
+details{margin-top:40px;border-top:1px solid var(--line);padding-top:18px;color:var(--muted);font-size:14px}
+summary{cursor:pointer;color:var(--text)}
+details ul{padding-left:18px}
+.note{margin-top:10px;font-size:14px;color:var(--muted)}
+footer{margin-top:48px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:13px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+footer a{color:var(--accent);text-decoration:none}
+@media (max-width:600px){.wrap{padding:24px 16px 40px}h1{font-size:22px}.hero{padding:22px}}
+@media print{html,body{background:#fff;color:#111}.hero,.risk,ol.qs li{background:#fff;border-color:#ddd}.risk p,ul.good li{color:#222}code{background:#f4f6fa;color:#123;border-color:#ddd}}
+</style>
+</head>
+<body>
+<main class="wrap">
+<header><div class="brand"><span class="dot"></span><b>Comity Intuition</b><span>· gut check before you ship</span></div>
+<div class="meta">tiny-shop · 21 Oct 2026, 14:18</div></header>
+<section class="hero" style="--v:var(--red)">
+<span class="pill"><i></i>Don't ship yet</span>
+<h1>The staff discount and $5 international shipping both work, but anyone can claim to be staff and get 50% off, so don&#39;t ship yet.</h1>
+</section>
+<h2>What changed</h2>
+<ul class="changes"><li>New STAFF50 discount code takes 50% off the order. It is meant for staff only and has no real expiry date (set to 2099).</li><li>Orders outside the US now pay a flat $5 shipping fee. Tax and discounts don&#39;t apply to it, and US orders still ship free.</li><li>Checkout now needs a two-letter country code (e.g. US, DE). Orders without one, or with a code that isn&#39;t two letters, are refused.</li><li>Saved orders now record the country, which wasn&#39;t asked for but is useful for fulfilment.</li><li>Five new automated tests cover the discount and shipping rules. All tests pass. Nothing has been committed or published yet.</li></ul>
+<h2>Things to check</h2>
+<article class="risk" style="--l:var(--red)">
+  <div class="tags"><span class="tag level">High risk</span><span class="tag">money</span><span class="tag">high confidence</span></div>
+  <h3>Any shopper can get the 50% staff discount</h3>
+  <p>Checkout decides who is staff from a &#39;staff&#39; flag that the shopper&#39;s own browser sends, and nothing on the server checks it. Anyone who learns the code, and staff codes tend to get shared, can add that flag and get half off every order. The developer saw this happen in their own test and flagged it. Before launch, choose a real check: staff logins, a server-side list of staff emails with email confirmation, or unique single-use codes for each employee.</p>
+  <div class="where">Where: <code>src/pricing.js</code> <code>src/server.js</code></div>
+</article>
+<article class="risk" style="--l:var(--amber)">
+  <div class="tags"><span class="tag level">Medium risk</span><span class="tag">reliability</span><span class="tag">medium confidence</span></div>
+  <h3>Existing checkout callers will start getting errors</h3>
+  <p>Every checkout now has to include a country, or the order is refused. If a shop front-end, app or integration already sends orders without that field, all of its orders will fail after this ships. Make sure every checkout form is updated to send the country at the same time.</p>
+  <div class="where">Where: <code>src/server.js</code></div>
+</article>
+<article class="risk" style="--l:var(--green)">
+  <div class="tags"><span class="tag level">Low risk</span><span class="tag">money</span><span class="tag">high confidence</span></div>
+  <h3>Shoppers can claim to be in the US</h3>
+  <p>The shipping fee depends only on the country the shopper types in. It isn&#39;t tied to a delivery address. An international customer could pick &#39;US&#39; and avoid the $5 fee. The loss per order is small, but if you later collect delivery addresses, the fee should come from that address.</p>
+  <div class="where">Where: <code>src/server.js</code> <code>src/pricing.js</code></div>
+</article>
+<h2>Questions to ask a developer</h2>
+<ol class="qs"><li>How will checkout confirm that someone using STAFF50 is really an employee, and not just someone who sends the &#39;staff&#39; flag?</li><li>Which checkout forms or apps call the checkout today, and will they all send the new country field when this goes live?</li><li>Should the $5 fee be based on the actual delivery address rather than a country the shopper types in?</li><li>The VIP25 code has the same self-reported check. Can we fix both codes in the same way?</li></ol>
+<h2>Good news</h2>
+<ul class="good"><li>The change is small and limited to the pricing and checkout parts of the shop.</li><li>New tests check the discount maths, the shipping fee and the rules that refuse a bad country code, and the existing tests still pass.</li><li>The developer raised the staff-discount hole themselves and held off on committing it.</li></ul>
+<details><summary>About this review · 4 files reviewed</summary>
+<p>Reviewer: Claude Code (claude-opus-5-5), as a forked copy of the coding session, so it knew what was asked and why.</p>
+<ul><li><code>src/orders.js</code></li><li><code>src/pricing.js</code></li><li><code>src/server.js</code></li><li><code>test/pricing.test.js</code></li></ul>
+
+<p class="note">Report id <code>2026-10-21T18-18-29-b22d1d</code>. Comity Intuition runs on your computer with your own AI subscription. Nothing was sent to Comity.</p>
+</details>
+<footer><span>Reviewed by Comity Intuition · free &amp; open source · <a href="https://comity.so">comity.so</a></span><span>RED</span></footer>
+</main>
+</body>
+</html>

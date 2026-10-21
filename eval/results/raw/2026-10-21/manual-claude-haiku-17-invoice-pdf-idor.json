@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-16-0fd789",
+  "created_at": "2026-10-21T19:16:16.288Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/17-invoice-pdf-idor",
+  "base": "855bf98a09ef100933d44d1f15d15b48d0076633",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Adds invoice PDF downloads, but any signed-in customer could download other customers' invoices, so this should not ship yet.",
+  "what_changed": [
+    "Customers can now download a PDF copy of an invoice, which they can forward to their accountant.",
+    "The PDF shows the invoice number, date, total, and the customer's email address.",
+    "The invoice list now includes an invoice ID, which the download link uses to find the right invoice.",
+    "The download link checks that the customer is signed in, but it does not check that the invoice belongs to them."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Any signed-in customer can download anyone's invoice",
+      "explanation": "The new download link looks up any invoice by its number. It never checks that the invoice belongs to the person asking. The existing invoice list does check this, so the new link skips a safeguard the app already uses. A customer who signs in could change the number in the link and read other customers' invoices. Each PDF shows the customer's email address, the invoice total, and the invoice date. Invoice numbers are likely to be sequential, which makes this easy to exploit at scale. Fix this before release by only returning invoices that belong to the signed-in customer, and return a 'not found' response for everything else.",
+      "where": [
+        "app/routes_invoices.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "reliability",
+      "title": "Hand-built PDF may not open cleanly in every case",
+      "explanation": "The PDF is assembled by hand as plain text. Characters such as brackets or backslashes in an email address or invoice number are not escaped, and the length count uses characters rather than bytes. Ordinary invoice data will probably work, but unusual text could produce a broken file. Test the download with a non-English name or an email containing special characters before release.",
+      "where": [
+        "app/pdf.py"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you add a check so the new invoice download only works when the invoice belongs to the signed-in customer, and confirm that another customer's invoice number returns 'not found'?",
+    "Can you test the download with an invoice from a second test account to confirm it is blocked?",
+    "Can you test a PDF with special characters in the customer's email or the invoice number, and confirm it opens in a PDF reader?"
+  ],
+  "good_news": [
+    "The change is small and contained to two files.",
+    "The invoice list already limits results to the signed-in customer, so the fix can follow the same pattern."
+  ],
+  "files_reviewed": [
+    "app/pdf.py",
+    "app/routes_invoices.py"
+  ],
+  "truncated": false
+}

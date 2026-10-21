@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-27-ec9203",
+  "created_at": "2026-10-21T19:16:27.912Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/16-refund-overpay-buried",
+  "base": "b679d36e48e2e66bec8fab354b8a733ca2a79249",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Partial refunds were added, but the new code can refund too much and can pay the same refund twice.",
+  "what_changed": [
+    "Support agents can now refund part of a member's order, such as one missed class, by typing an amount.",
+    "If the amount is left empty, the refund covers whatever is still unrefunded on the order, as before.",
+    "The refund button now says \"Refund\", and a new field asks for the amount to refund.",
+    "The \"refund sent\" message now promises 5–10 business days instead of 5–10 days.",
+    "The \"order not found\" message now asks the agent to check the order number and try again.",
+    "The code no longer blocks a refund on an order that is already fully refunded. Before, it showed an error.",
+    "No screen in this copy calls the refund code yet, so agents cannot use it today. The risks below apply once it is connected."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Repeated clicks or retries can refund the member twice",
+      "explanation": "Each refund request now gets a new, unique reference based on the current time. The payment company uses that reference to spot a repeated request, so with a new reference every repeat goes through as a new refund. A double click, a slow connection, or two agents acting at once could each pay out money. The old version used a fixed reference for full refunds, which blocked this.",
+      "where": [
+        "src/refunds/refund.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Refund amount is not checked against what was paid",
+      "explanation": "The typed amount is never compared with the amount paid or the amount already refunded. A typing mistake, such as 200 instead of 20, would refund 200. Removing the old check also means a refund on a fully refunded order now sends a zero or negative amount to the payment company instead of stopping. Those requests may be rejected, or they may be misread by the payment system.",
+      "where": [
+        "src/refunds/refund.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Where is the refund button connected to this code, and does that screen check the typed amount before it sends the refund?",
+    "Can each refund request carry a stable reference, so that a repeated click or retry cannot pay out the same money twice?",
+    "Should the code block any refund larger than the amount still unrefunded, and block refunds on orders that are already fully refunded, as the old version did?",
+    "Has the payments team confirmed that \"5–10 business days\" is the correct timing to show members?"
+  ],
+  "good_news": [
+    "The change is small and limited to refunds. No stored data is deleted or restructured.",
+    "The total already refunded now adds up across several partial refunds, instead of being overwritten by the full amount.",
+    "The dollar formatting gives the same output for normal amounts."
+  ],
+  "files_reviewed": [
+    "README.md",
+    "src/format.ts",
+    "src/refunds/refund.ts",
+    "src/ui/strings.ts"
+  ],
+  "truncated": false
+}

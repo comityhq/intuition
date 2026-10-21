@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-14-24-4f6bed",
+  "created_at": "2026-10-21T19:14:24.468Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/hook-20261021T191307/01-checkout-discount-stacking",
+  "base": "1980e2a2714574aa8bab2d60cde464a13fed07db",
+  "head": "b78f895814b7238b738c9ae07442bd3381288e7b",
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": "0ac22a5f-47ba-49ad-bb2f-0160572e766c"
+  },
+  "verdict": "red",
+  "headline": "Customers can now stack promo codes, but with no limits, so anyone can get a whole order for free.",
+  "what_changed": [
+    "At checkout, customers can now enter more than one promo code on the same order. Before, only one code was allowed.",
+    "Each code's percentage is worked out on the full price and added up. For example, 15% plus 25% gives 40% off.",
+    "One new automatic test checks that a referral code and a seasonal code combine correctly. All 3 tests pass.",
+    "The patch was applied as you asked and nothing else was changed. It is not saved as a finished version yet, so it is easy to undo."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Stacked codes can make orders completely free",
+      "explanation": "There is no limit on how many codes are used or which ones are combined, and the discount can be bigger than the price. Using all four current codes takes a $40 order to $0. Using the 50% staff code three times takes it below zero. When the total is zero or less, the payment step skips charging the card and still creates the order, so the customer pays nothing.",
+      "where": [
+        "src/cart/discounts.js",
+        "src/payments.js",
+        "src/server.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "The same code can be applied again and again",
+      "explanation": "Nothing stops a customer from entering the same code several times. Each entry adds another full discount. The old rule that blocked a second code was removed and nothing replaced it. A developer should make the checkout reject a code that is already on the order.",
+      "where": [
+        "src/cart/discounts.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Any codes combine, not just referral plus seasonal",
+      "explanation": "The note in the code says the goal is to combine a referral code with a seasonal offer. But the code lets any codes combine, including the 50% staff code with every public offer. The list of codes already marks which one is a referral code, but the new code never checks it. Decide which combinations are allowed, then have a developer enforce them.",
+      "where": [
+        "src/cart/discounts.js",
+        "src/cart/promoCodes.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you make the checkout reject a promo code that is already on the order?",
+    "Which combinations should be allowed? For example, at most one referral code plus one other code, with the staff code never combined with anything?",
+    "Can you make sure the total discount can never be more than the order price, and never lets an order go through for $0 by accident?",
+    "Can you add tests that try to apply the same code twice and try to combine every code at once, so this can't come back unnoticed?"
+  ],
+  "good_news": [
+    "The change is small and touches only the discount part of checkout, so fixing it should be quick.",
+    "The basic case Priya intended, a referral code plus a seasonal code, works and is covered by a test.",
+    "Nothing has been saved or published yet, so the change can easily be undone or fixed first."
+  ],
+  "files_reviewed": [
+    "src/cart/discounts.js",
+    "src/cart/store.js",
+    "test/discounts.test.js"
+  ],
+  "truncated": false
+}

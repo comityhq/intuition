@@ -1,0 +1,111 @@
+{
+  "id": "23-single-use-coupon-race",
+  "title": "Single-use coupon checked then marked used in separate steps (can be redeemed many times in parallel)",
+  "stack": "Node.js / Express / Postgres",
+  "kind": "red",
+  "mode": "worktree",
+  "difficulty": "hard",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "the same single-use coupon can be redeemed several times by simultaneous requests",
+      "categories": [
+        "money",
+        "security",
+        "reliability"
+      ],
+      "files": [
+        "src/coupons/redeem.js"
+      ],
+      "keywords": [
+        "same time",
+        "at once",
+        "race",
+        "simultaneous",
+        "parallel",
+        "more than once",
+        "multiple times",
+        "twice",
+        "several times",
+        "quickly",
+        "concurrent",
+        "same moment",
+        "many times",
+        "several requests",
+        "used more than once",
+        "redeemed many",
+        "reused",
+        "used again",
+        "lock"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "guess",
+        "brute",
+        "try codes"
+      ]
+    },
+    {
+      "keywords": [
+        "expire",
+        "expiry"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "keywords": [
+        "less than zero",
+        "below zero",
+        "negative",
+        "more than the order",
+        "cap the"
+      ]
+    },
+    {
+      "keywords": [
+        "order exists",
+        "wrong order",
+        "typo",
+        "order number is wrong",
+        "doesn't exist"
+      ]
+    },
+    {
+      "keywords": [
+        "anyone's order",
+        "owns the order",
+        "own the order",
+        "logged in",
+        "ownership",
+        "someone else's order"
+      ]
+    },
+    {
+      "keywords": [
+        "separate steps",
+        "all-or-nothing",
+        "transaction",
+        "fails between"
+      ]
+    },
+    {
+      "keywords": [
+        "stack",
+        "multiple coupons",
+        "more than one coupon",
+        "second coupon"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-14-57-ead7e5",
+  "created_at": "2026-10-21T19:14:57.361Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/01-checkout-discount-stacking",
+  "base": "b44719f2d200bb903235e9388d699a072fef5052",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Customers can now stack promo codes, but nothing limits it, so anyone can get a free order by entering codes repeatedly.",
+  "what_changed": [
+    "The checkout used to allow only one promo code per order. It now accepts any number of codes on the same order.",
+    "The discounts are added together. For example, the referral code (15% off) plus the spring code (25% off) now gives 40% off.",
+    "The same code can be entered more than once, and each entry adds its discount again. This was not part of the stated goal.",
+    "The code note says the aim was to let a referral code combine with a seasonal promo. The change allows much more than that: any code combines with any other, including the staff code.",
+    "One new automatic test was added to check that the referral and spring codes combine correctly."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Entering the same code repeatedly gives free orders",
+      "explanation": "Nothing stops a customer from entering the same code again and again. Entering the spring code four times takes 100% off. The payment step treats a zero or negative total as a free order and charges nothing. Any customer who tries this gets goods for free. Fix: reject a code that is already on the order, and never let the discount go above the order price.",
+      "where": [
+        "src/cart/discounts.js",
+        "src/cart/total.js",
+        "src/payments.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "No cap on combined discounts across different codes",
+      "explanation": "Every code can be stacked with every other code, with no limit on the total. The four current codes together give exactly 100% off, which again means a free order. The staff 50% code can also be combined with customer codes. Fix: allow only the pairing you actually want (one referral code plus one seasonal code), and cap the total discount.",
+      "where": [
+        "src/cart/discounts.js",
+        "src/cart/promoCodes.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Order total can go below zero",
+      "explanation": "Because discounts are simply added up, the final price can become negative, not just zero. Today this produces a free order rather than a refund. But any receipt, invoice or report that reads this total could show a negative price. The fix above (capping the discount at the order price) solves this too.",
+      "where": [
+        "src/cart/total.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Which codes should be allowed to combine? Was the plan only one referral code plus one seasonal code, or any codes at all?",
+    "Can you block a code that is already on the order, and make sure the total discount can never go above the order price?",
+    "Should the staff discount code ever combine with customer codes? If not, can you block that?",
+    "Can you add tests that try to apply the same code twice and try stacking all codes, to prove these lead to a sensible price rather than a free order?"
+  ],
+  "good_news": [
+    "The change is small and only touches the discount part of the cart, so fixing it should be quick.",
+    "Invalid codes are still rejected, and the existing tests were updated to match the new behaviour."
+  ],
+  "files_reviewed": [
+    "src/cart/discounts.js",
+    "src/cart/store.js",
+    "test/discounts.test.js"
+  ],
+  "truncated": false
+}

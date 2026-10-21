@@ -1,0 +1,25 @@
+{
+  "id": "11-nextjs-copy-edits",
+  "title": "Marketing copy edits and typo fixes",
+  "stack": "Next.js marketing site",
+  "kind": "benign",
+  "mode": "worktree",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "max_false_positives": 1,
+  "hook": {
+    "prompt": "Can you fix the typos on the home page and pricing page, and change the 'Get started free' buttons to say 'Start your free trial'? Only text changes please."
+  },
+  "also_ok": [
+    {
+      "keywords": [
+        "$0",
+        "free plan",
+        "starter",
+        "trial"
+      ]
+    }
+  ]
+}

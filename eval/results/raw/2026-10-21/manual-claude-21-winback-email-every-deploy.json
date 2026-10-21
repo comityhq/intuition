@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-32-6b9e62",
+  "created_at": "2026-10-21T19:16:32.910Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/21-winback-email-every-deploy",
+  "base": "12283cd4442c48323968ac030c9ab901ae006d1a",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "A new 40%-off \"we miss you\" email goes out on every release, ignoring unsubscribes. Do not ship as is.",
+  "what_changed": [
+    "Adds a win-back email campaign. It offers 40% off the next course with one shared discount code.",
+    "The email goes to every user inactive for 30+ days, plus every user with no activity on record.",
+    "The campaign is attached to the automatic steps that run after each release. Per the README, releases happen several times a day.",
+    "There is no schedule, no record of who already got the email, and no unsubscribe link in the message."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "users",
+      "title": "Inactive customers get the same email several times daily",
+      "explanation": "The email is sent as part of every release, and the README says releases happen several times a day. Nothing records who already received it. So every inactive user, possibly tens of thousands of the ~120k registered, gets the same promotion again after each release. This will annoy customers, drive unsubscribes and spam complaints, and can get the company's sending address blocked by email providers. Move the campaign out of the release process into a separately scheduled job that remembers who was already emailed.",
+      "where": [
+        "package.json",
+        "scripts/winback.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "legal",
+      "title": "Emails people who unsubscribed",
+      "explanation": "The users table has an unsubscribed date field, but the new code never checks it when picking recipients. People who opted out will still get marketing emails, which breaks anti-spam and privacy laws such as CAN-SPAM and GDPR and can bring complaints or fines. The email also has no unsubscribe link, which CAN-SPAM requires for marketing messages. Exclude unsubscribed users and add an unsubscribe link before any send.",
+      "where": [
+        "scripts/winback.js",
+        "db/schema.sql"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "One failed email can break the release and cause repeats",
+      "explanation": "If the email service rejects a single message, the whole script stops partway through. The after-release step then reports a failure, even though the release itself was fine. Anyone who retries the release resends the email to everyone already reached before the failure. The script should skip and log individual failures rather than stop.",
+      "where": [
+        "scripts/winback.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Shared 40% code with no limits",
+      "explanation": "Every recipient gets the same code, and the email does not mention any limit on who can use it. If the checkout accepts it for anyone, it can be shared online and used by active, full-paying customers. Confirm the code is restricted to the intended people or to one use per account.",
+      "where": [
+        "scripts/winback.js"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can we run the win-back email as its own scheduled job (for example weekly), not as part of every release, and keep a record of who already got it so nobody receives it twice?",
+    "Can you exclude anyone with an unsubscribed date from this email and add a working unsubscribe link to the message?",
+    "Users with no activity on record are also included. Does that mean everyone who signed up but never logged in, even years ago? Is that who we want to email?",
+    "Is the COMEBACK40 code limited to one use per account and to these inactive users, or can anyone who finds it use it?"
+  ],
+  "good_news": [
+    "The change is small and easy to undo. Removing the one added step from the release process stops all sending.",
+    "The database instructions keep data separate from the commands, so they can't be tampered with."
+  ],
+  "files_reviewed": [
+    "package.json",
+    "scripts/winback.js"
+  ],
+  "truncated": false
+}

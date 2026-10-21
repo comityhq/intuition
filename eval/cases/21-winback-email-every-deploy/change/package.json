@@ -1,0 +1,8 @@
+{
+  "name": "snapcourse-api",
+  "version": "3.3.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node src/index.js", "build": "echo build ok", "postdeploy": "node scripts/migrate.js && node scripts/winback.js" },
+  "dependencies": { "pg": "^8.12.0" }
+}

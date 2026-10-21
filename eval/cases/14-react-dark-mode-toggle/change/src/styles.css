@@ -1,0 +1,5 @@
+:root { --bg: #ffffff; --fg: #1f2328; --muted: #656d76; }
+:root[data-theme="dark"] { --bg: #0d1117; --fg: #e6edf3; --muted: #8d96a0; }
+body { background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; transition: background 0.2s, color 0.2s; }
+header { display: flex; gap: 12px; align-items: center; }
+button { background: transparent; color: var(--fg); border: 1px solid var(--muted); border-radius: 6px; padding: 4px 10px; cursor: pointer; }

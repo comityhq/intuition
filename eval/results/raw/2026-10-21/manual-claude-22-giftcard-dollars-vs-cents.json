@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-33-430967",
+  "created_at": "2026-10-21T19:16:33.721Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/22-giftcard-dollars-vs-cents",
+  "base": "6e14867e4062193a86e4d5f54720f2d7163c90bb",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "New gift card purchase charges buyers about one hundredth of the price, so a $100 card costs $1. Don't ship yet.",
+  "what_changed": [
+    "Customers can now buy a BrewBox gift card ($25, $50 or $100) for someone else.",
+    "The buyer's card is charged, and the buyer gets a gift code back.",
+    "The README now has a short note describing gift card purchases.",
+    "The recipient's email address is collected, but no email is sent to them yet."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Gift cards charged in cents instead of dollars",
+      "explanation": "The gift card price list stores amounts in dollars (25, 50, 100). The payment system expects cents. So a $25 card charges 25 cents, and a $100 card charges $1. Every gift card sold would lose almost all its value. The developer needs to convert dollars to cents (multiply by 100) or store prices in cents before this ships.",
+      "where": [
+        "src/giftcards/purchase.ts",
+        "src/giftcards/catalog.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "Gift codes are never saved, so they can't be redeemed",
+      "explanation": "The code is created and handed back, but it isn't recorded anywhere. Nothing in the app can later check that a code is real or how much it's worth. Buyers would pay for a card the recipient can't use, which leads to refunds and complaints. Ask the developer how codes get stored and redeemed.",
+      "where": [
+        "src/giftcards/purchase.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Double-charge protection doesn't work on retries",
+      "explanation": "The protection against charging the same purchase twice is tied to a brand new random code made on each attempt. If the buyer clicks twice, or the connection drops and the purchase is retried, the payment company sees it as a new purchase. The buyer could be charged twice for one card. Regular orders tie this protection to a fixed order number; gift cards should do the same.",
+      "where": [
+        "src/giftcards/purchase.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "users",
+      "title": "Recipient is never told about their gift",
+      "explanation": "The recipient's email is taken but no email is sent. Unless something else handles it, the person receiving the gift won't hear about it. Confirm who delivers the code.",
+      "where": [
+        "src/giftcards/purchase.ts"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "The gift card prices are stored in dollars, but the payment system expects cents. Can you fix it so a $25 card actually charges $25, and add a check that proves it?",
+    "Where is each gift code saved, and how does the shop check a code and its balance when someone tries to use it?",
+    "If a buyer clicks 'buy' twice or the connection drops, what stops them being charged twice? Can you tie the double-charge protection to a fixed purchase number instead of a fresh random code?",
+    "Who sends the gift code to the recipient's email, and when?"
+  ],
+  "good_news": [
+    "The change is small and kept to its own new file, so it doesn't alter the existing coffee checkout.",
+    "Gift codes are made with a strong random generator, so they are hard to guess."
+  ],
+  "files_reviewed": [
+    "README.md",
+    "src/giftcards/purchase.ts"
+  ],
+  "truncated": false
+}

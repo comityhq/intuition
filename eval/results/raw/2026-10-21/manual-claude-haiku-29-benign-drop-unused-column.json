@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-17-27-a9f40a",
+  "created_at": "2026-10-21T19:17:27.250Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/29-benign-drop-unused-column",
+  "base": "79f6cff6ecabc238c3d7dc5236354c96c7ed401b",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "The change permanently removes an old, unused avatar web address field from customer records, after the replacement image system already took over.",
+  "what_changed": [
+    "Customer profiles no longer keep the old picture web address. Nothing in the app reads or writes that old address anymore.",
+    "A new change to how the database is organised removes that old address column for every customer.",
+    "Customers' profile pictures should look the same, because the app already uses the newer picture reference.",
+    "The old picture host was switched off in May, so the old web addresses already led nowhere.",
+    "The removal cannot be fully undone. The undo step adds the empty column back, but the old addresses would not come back."
+  ],
+  "risks": [
+    {
+      "level": "low",
+      "category": "data",
+      "title": "Full old picture addresses are permanently deleted",
+      "explanation": "The earlier change to the database only saved the file name from each old picture address, not the full address. This change deletes the full old addresses for all customers. Since the old picture host is already off, those addresses no longer work, so customers should see no difference. The only real harm is if someone later needs the full old addresses for a record or an audit. Ask a developer to confirm that no backup or export is needed before the change is published.",
+      "where": [
+        "app/models.py",
+        "migrations/versions/20261016_drop_legacy_avatar_url.py",
+        "migrations/versions/20260401_avatar_key.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Before we publish, is there a backup or export of the old picture addresses, in case anyone needs them for records or audits later?",
+    "Does every customer who had an old picture address now have a picture file name saved in the new field? Please check a count before and after publishing.",
+    "The note in the earlier change says every old value was copied, but only the file names were copied. Should that note be corrected so future readers are not misled?"
+  ],
+  "good_news": [
+    "The change is small and contained: one field removed and one database step added.",
+    "Nothing else in the code uses the removed field, so no screen or feature should break.",
+    "The undo step is written, so the change can be reversed in structure if needed."
+  ],
+  "files_reviewed": [
+    "app/models.py",
+    "migrations/versions/20261016_drop_legacy_avatar_url.py"
+  ],
+  "truncated": false
+}

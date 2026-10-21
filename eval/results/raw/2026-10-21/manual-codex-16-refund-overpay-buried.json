@@ -1,0 +1,55 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-09-04-0e5ab1",
+  "created_at": "2026-10-21T19:09:04.826Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/16-refund-overpay-buried",
+  "base": "b679d36e48e2e66bec8fab354b8a733ca2a79249",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Partial refunds can overpay customers or be sent twice, so this should not ship yet.",
+  "what_changed": [
+    "Support staff can now enter a refund amount or leave it empty to refund the remaining balance.",
+    "The refund screen uses shorter labels and clearer customer-facing timing.",
+    "Refund records now show the dollar amount in staff logs.",
+    "The README now says that partial refunds are supported."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Refunds can exceed the remaining balance",
+      "explanation": "The new partial-refund path sends any entered amount without checking it is positive or no more than the unpaid refund balance. A staff member can enter more than remains, including after an earlier partial refund. This can overpay a customer if the payment service accepts the request. Check the amount before sending it, and reject amounts above the remaining balance.",
+      "where": [
+        "src/refunds/refund.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "A retry can send a second refund",
+      "explanation": "Each refund attempt now gets a new unique label based on the current time. If the payment succeeds but saving the order fails, a retry looks like a new request. For a partial refund, the payment service can then send the same refund again, while the order may record only one. Keep one stable protection label for a given refund attempt and save a durable refund record.",
+      "where": [
+        "src/refunds/refund.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [],
+  "good_news": [
+    "The customer-facing refund timing now says business days, which is clearer.",
+    "The change is limited to refunds, wording, and documentation."
+  ],
+  "files_reviewed": [
+    "README.md",
+    "src/format.ts",
+    "src/refunds/refund.ts",
+    "src/ui/strings.ts"
+  ],
+  "truncated": false
+}

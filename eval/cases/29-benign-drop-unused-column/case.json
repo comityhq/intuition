@@ -1,0 +1,31 @@
+{
+  "id": "29-benign-drop-unused-column",
+  "title": "Drop users.legacy_avatar_url: replaced by avatar_key six months ago (values copied), no code reads it (safe twin of 05)",
+  "stack": "Python / SQLAlchemy / Alembic / Postgres",
+  "kind": "benign",
+  "mode": "worktree",
+  "difficulty": "twin",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "also_ok": [
+    {
+      "keywords": [
+        "undo",
+        "downgrade",
+        "backup",
+        "restore",
+        "reverse"
+      ]
+    },
+    {
+      "keywords": [
+        "lock",
+        "busy",
+        "large table"
+      ]
+    }
+  ],
+  "max_false_positives": 1
+}

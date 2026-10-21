@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-25-f0d750",
+  "created_at": "2026-10-21T19:16:25.618Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/19-benign-additive-migration",
+  "base": "23d442cc6d75c34f31052c6b84ade543c51fa182",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "This adds a newsletter opt-in for patients that starts switched off for everyone. It is safe to ship.",
+  "what_changed": [
+    "Each patient record now has a yes/no setting for whether they want the clinic newsletter.",
+    "Every patient starts at \"no\". That covers existing patients and new sign-ups. Nobody is signed up without choosing it.",
+    "The app can now save a patient's newsletter choice. No button or profile page uses this yet, so patients won't see anything new.",
+    "The database gets one new column (a change to how the database is organised). Nothing is removed or renamed, and the change can be undone cleanly.",
+    "Nothing sends a newsletter yet. This change only prepares for one."
+  ],
+  "risks": [
+    {
+      "level": "low",
+      "category": "legal",
+      "title": "The app doesn't record when or how consent was given",
+      "explanation": "The app saves only yes or no. It doesn't save when the patient agreed or what wording they saw. Under privacy laws like GDPR, the clinic may need to prove consent if someone complains. Consider recording the date and wording before the first newsletter goes out.",
+      "where": [
+        "app/models.py",
+        "app/profile.py"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "When we build the newsletter sending, will it only email patients who said yes? Will every email have an unsubscribe link that switches this setting back to no?",
+    "Should we also save the date a patient opted in, and the wording they agreed to, so we can prove consent later?",
+    "Where will patients see this choice on their profile page? Will it check that they can only change their own setting?"
+  ],
+  "good_news": [
+    "Everyone starts opted out, existing patients included. That is the safe, privacy-friendly default.",
+    "The change is small and only adds things. It doesn't touch the existing text-message reminders or their opt-out.",
+    "The database change can be undone without affecting any other data."
+  ],
+  "files_reviewed": [
+    "app/models.py",
+    "app/profile.py",
+    "migrations/versions/20261015_add_marketing_opt_in.py"
+  ],
+  "truncated": false
+}

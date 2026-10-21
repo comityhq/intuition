@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-59-55ea84",
+  "created_at": "2026-10-21T19:16:59.612Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/22-giftcard-dollars-vs-cents",
+  "base": "6e14867e4062193a86e4d5f54720f2d7163c90bb",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The new gift card purchase would charge customers one hundredth of the price, so it should not ship yet.",
+  "what_changed": [
+    "Adds a gift card purchase feature in the code. No screen or customer page uses it yet, so no one has been charged.",
+    "Gift cards are offered at $25, $50 and $100.",
+    "Each purchase charges the buyer and creates a random 16-character code meant to be given to the recipient.",
+    "The project's README gets a short note describing the gift card purchase."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Gift cards would charge one hundredth of their price",
+      "explanation": "Gift card prices are stored in dollars, but the payment step reads the number as cents. A $25 card would charge 25 cents, and a $100 card would charge $1. Nothing calls the feature yet, so no customer has been charged. If it goes live as written, the business would collect a tiny fraction of each sale, and receipts would not match what customers saw. The fix is to convert dollars to cents before charging, and to add a test that checks the amount.",
+      "where": [
+        "src/giftcards/purchase.ts",
+        "src/giftcards/catalog.ts",
+        "src/payments/gateway.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Gift card codes are never saved, so buyers may pay for nothing",
+      "explanation": "The purchase step creates the code and hands it back, but nothing stores it. No redemption step exists in this project either, so a code could not be used even if the buyer received it. If the feature went live without that work, customers would pay for a card they could not use. Save each code with its purchase record before the charge is made, and build redemption before launch.",
+      "where": [
+        "src/giftcards/purchase.ts"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "A timed-out payment could charge a buyer with no code issued",
+      "explanation": "The payment call gives up after 8 seconds. If the card is charged but the reply is lost, the purchase fails and the new code is thrown away, leaving a charge with no record to match it to. The duplicate-charge safeguard uses a code generated fresh on each attempt, so a manual retry would not be blocked and could charge the buyer twice. Use a stored purchase record and a stable reference per purchase, and check the gateway before retrying.",
+      "where": [
+        "src/giftcards/purchase.ts",
+        "src/payments/gateway.ts"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Is the gift card price in the catalog meant to be dollars? Please confirm that a $25 card sends 2,500 to the payment service, and fix the conversion before launch.",
+    "Where will each gift card code be stored, and how will a customer redeem it at checkout? Is redemption built anywhere else?",
+    "If a payment times out after the card was charged, how will we find that charge and give the buyer their code? Should we save a purchase record before charging?",
+    "Will the recipient get an email with the code? If so, does the email check the address and respect people who have opted out of emails?"
+  ],
+  "good_news": [
+    "Nothing customer-facing uses the feature yet, so no customer has been charged wrongly.",
+    "The change is small and contained: two new files and a short note in the README.",
+    "The existing payment code already expects amounts in cents, so the fix is one contained conversion."
+  ],
+  "files_reviewed": [
+    "README.md",
+    "src/giftcards/purchase.ts"
+  ],
+  "truncated": false
+}

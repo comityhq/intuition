@@ -1,0 +1,58 @@
+{
+  "id": "05-sql-migration-drop-used-column",
+  "title": "Migration drops users.phone while SMS reminders still read it",
+  "stack": "Python / SQLAlchemy / Alembic / Postgres",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "dropping phone column deletes data and breaks SMS reminders that still use it",
+      "categories": [
+        "data",
+        "reliability",
+        "users"
+      ],
+      "files": [
+        "migrations/versions/20261014_drop_user_phone.py",
+        "app/models.py",
+        "app/reminders/sms.py"
+      ],
+      "keywords": [
+        "phone",
+        "sms",
+        "text message",
+        "reminder",
+        "contact number"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "also_ok": [
+    {
+      "keywords": [
+        "undo",
+        "downgrade",
+        "reverse",
+        "roll back",
+        "rollback",
+        "backup",
+        "restore"
+      ]
+    },
+    {
+      "keywords": [
+        "crm"
+      ]
+    },
+    {
+      "keywords": [
+        "profile",
+        "contact details"
+      ]
+    }
+  ]
+}

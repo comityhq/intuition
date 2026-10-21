@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-46-4705c9",
+  "created_at": "2026-10-21T19:16:46.235Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/21-winback-email-every-deploy",
+  "base": "12283cd4442c48323968ac030c9ab901ae006d1a",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "This change emails a 40% discount to inactive users after every publish, including people who unsubscribed.",
+  "what_changed": [
+    "Every time the app is published, a win-back email offering 40% off is sent to inactive users.",
+    "A user counts as inactive if they have not been active for 30 days, or have never been active.",
+    "The email uses the subject \"We miss you! 40% off your next course\" and the discount code COMEBACK40.",
+    "The send runs as an extra step after the normal publish step. If it fails, the publish is reported as failed.",
+    "No screens, payments or existing customer features were changed."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "legal",
+      "title": "Emails go to people who already unsubscribed",
+      "explanation": "The customer list records when someone unsubscribes, but the new send step never checks that record. People who asked to stop getting emails will receive a marketing offer anyway. This breaks anti-spam and privacy rules such as CAN-SPAM (US) and GDPR (EU), and can lead to complaints and fines. Fix: skip every user who has an unsubscribe date before sending.",
+      "where": [
+        "scripts/winback.js",
+        "db/schema.sql"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "users",
+      "title": "Same customers get the offer again on every publish",
+      "explanation": "The send step is attached to the after-publish command, so it runs each time the app is published. It keeps no record of who was already emailed, so inactive users can get the 40% offer again and again, sometimes within days. Fix: record each send and skip anyone already emailed, or remove this step from the publish command and run it once on purpose.",
+      "where": [
+        "package.json",
+        "scripts/winback.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "legal",
+      "title": "Marketing email has no unsubscribe link or company address",
+      "explanation": "The email body contains only a greeting and the discount code. It has no unsubscribe link and no postal address, which marketing emails normally need under anti-spam laws. Customers who want out have no simple way to opt out from this email.",
+      "where": [
+        "scripts/winback.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "reliability",
+      "title": "One failed email stops the run and causes repeats",
+      "explanation": "The loop has no error handling. If the mail service rejects one email, the whole run stops, the publish step fails, and a retry would send emails again to the people who were already reached. This is a realistic outcome given that mail services sometimes fail.",
+      "where": [
+        "scripts/winback.js",
+        "src/email.js"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you make the send skip every user who has an unsubscribe date, and confirm that before it sends?",
+    "Can you stop this email from being sent on every publish, so each customer gets it only once, and record who has been sent it?",
+    "Is the code COMEBACK40 real, limited to one use per customer, and set to expire? Who approved a 40% discount for this list?",
+    "Should people who have never used the app (no activity date at all) get a discount email? Do we have their consent to email them?",
+    "Can you add an unsubscribe link and our company postal address to the email, as anti-spam laws require?"
+  ],
+  "good_news": [
+    "The change is small and contained, touching only two files.",
+    "The mail sending key is kept in a setting rather than written into the code.",
+    "The customer list already has an unsubscribe field, so the fix is simple to make."
+  ],
+  "files_reviewed": [
+    "package.json",
+    "scripts/winback.js"
+  ],
+  "truncated": false
+}

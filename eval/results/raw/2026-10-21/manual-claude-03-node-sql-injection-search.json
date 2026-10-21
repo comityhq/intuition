@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-00-5a46f0",
+  "created_at": "2026-10-21T19:15:00.343Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/03-node-sql-injection-search",
+  "base": "72cd86175e5c26aef7c2fdc14296f7f45182cc8a",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Product search gained category filtering and sorting, but it now lets anyone run their own database commands. Do not ship.",
+  "what_changed": [
+    "Shoppers can now filter product search results by category.",
+    "Shoppers can now choose how search results are sorted. Before, results were always sorted by name.",
+    "Search results now include each product's category.",
+    "When a search fails, the app now sends the full error back to the visitor. That includes the exact database instructions it tried to run."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "security",
+      "title": "Anyone can run their own commands on the database",
+      "explanation": "The search box text, the category and the sort choice are now pasted straight into the database instructions. Before this change, the search text was kept separate from them. An attacker can type specially crafted text into the public product search and make the database do things it shouldn't. That includes reading the customer list (emails, full names and payment-provider customer IDs), and possibly changing or deleting data. This is a well-known, easy-to-find attack, so it is very likely to be tried. Ask the developer to keep every visitor-supplied value separate from the database instructions, and to allow only a fixed list of sort options.",
+      "where": [
+        "src/routes/products.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Customer personal data could leak through product search",
+      "explanation": "The same database also holds a customers table with emails, full names and payment-provider customer IDs. Because of the flaw above, a stranger could pull those records out through the product search page. A leak like that can trigger data-breach reporting duties under privacy laws such as GDPR, and it would damage customer trust.",
+      "where": [
+        "src/routes/products.js",
+        "db/schema.sql"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "security",
+      "title": "Error messages show visitors the internal database details",
+      "explanation": "When a search fails, the app now sends the raw error and the full database instructions back to whoever made the request. This tells an attacker exactly how to adjust their input until the attack works, and it reveals how the database is set up. Errors should show visitors a generic message and keep the details in internal logs.",
+      "where": [
+        "src/routes/products.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "users",
+      "title": "Normal searches with an apostrophe will now fail",
+      "explanation": "A shopper who searches for something like \"men's shoes\" will now get an error instead of results. That is because the apostrophe breaks the database instructions. Before this change, that search worked. Fixing the main security problem will also fix this.",
+      "where": [
+        "src/routes/products.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you change the product search so the search text and category are kept separate from the database instructions, the way the old version handled the search text?",
+    "Can you limit sorting to a fixed list of allowed options (for example name or price) and ignore anything else a visitor sends?",
+    "Can error responses show visitors a generic message and keep the technical details in our internal logs only?",
+    "Has this version been published anywhere public? If so, can we check the database logs for any unusual searches?"
+  ],
+  "good_news": [
+    "The change only touches product search, so fixing it is a small, contained job.",
+    "The new filter and sorting features are reasonable and can be kept once they are built safely."
+  ],
+  "files_reviewed": [
+    "src/routes/products.js"
+  ],
+  "truncated": false
+}

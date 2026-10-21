@@ -1,0 +1,61 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-50-f48c3f",
+  "created_at": "2026-10-21T19:15:50.994Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/hook-20261021T191307/15-fastapi-own-invoices-csv",
+  "base": "0f69bf5498e997149663ac5f64adaf4782a4fe06",
+  "head": "fc6da0469227fc263c03bf9ec54cc0fc43eb857d",
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": "462542e2-672f-400d-9145-1c426e20d517"
+  },
+  "verdict": "green",
+  "headline": "Customers can now download their own invoices as a spreadsheet file. The code looks safe, but its test has never been run.",
+  "what_changed": [
+    "Signed-in customers get a new download at a new web address. It gives them a spreadsheet file (CSV) of their own invoices for their accountant.",
+    "The file lists invoice number, date, total and status, newest first.",
+    "Totals show as normal money amounts like 123.45 instead of cents. The existing invoice list still uses cents.",
+    "The download is protected against a known spreadsheet trick: values that would run as formulas get a leading apostrophe, so they show as plain text instead.",
+    "One automated test was added, plus a small settings file so tests can find the app. The code is not yet committed, pushed or opened for review, because Python isn't installed on the machine."
+  ],
+  "risks": [
+    {
+      "level": "low",
+      "category": "reliability",
+      "title": "The new test has never actually been run",
+      "explanation": "Python wasn't available on the machine, so nobody has confirmed the test passes. When I read the code it looks correct, but a small mistake could still show up on the first run. Have a developer run the tests before this is published.",
+      "where": [
+        "tests/test_invoices_csv.py",
+        "app/routes_invoices.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "users",
+      "title": "Some invoice numbers may get an extra apostrophe",
+      "explanation": "An invoice number or status starting with a symbol such as =, +, - or @ gets a leading apostrophe in the file. This blocks a known spreadsheet attack. But if your real invoice numbers ever start with '-' or '+', accountants will see the apostrophe. This doesn't matter if your numbers look like 'INV-001'.",
+      "where": [
+        "app/routes_invoices.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you install Python, run the full test suite, and confirm the new invoice download test passes before we publish?",
+    "Do any of our real invoice numbers start with a symbol like '-' or '+'? If so, they will show a leading apostrophe in the downloaded spreadsheet. Is that acceptable?",
+    "Does the website have a 'Download CSV' button that links to the new address, or does that still need building?"
+  ],
+  "good_news": [
+    "The download uses the existing sign-in check and only fetches invoices belonging to the signed-in customer. The test checks that another customer's invoice is left out.",
+    "The change is small and self-contained. The existing invoice list works the same and now uses the same lookup as the download.",
+    "The browser is told not to keep a saved copy of the file, which helps on shared computers."
+  ],
+  "files_reviewed": [
+    "app/routes_invoices.py",
+    "pytest.ini",
+    "tests/test_invoices_csv.py"
+  ],
+  "truncated": false
+}

@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-17-08-8f2e09",
+  "created_at": "2026-10-21T19:17:08.935Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/25-cleanup-deletes-paying-customers",
+  "base": "fd1cbfe84a4af6b4c8f73bdcae039458a7327588",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "A new nightly job would delete paying customers who have not logged in for 90 days, along with their subscriptions and orders.",
+  "what_changed": [
+    "A new job runs every night at 3 AM and removes customer accounts that have not logged in for 90 days, or that have never logged in.",
+    "When an account is removed, the database also removes that customer's subscriptions and order history automatically.",
+    "The job also removes old login sessions that have expired. This part is harmless.",
+    "The stated reason is to lower the hosting bill. Removing customer accounts is unlikely to be the main driver of that cost, and the change does not show that it would be."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Nightly job deletes paying subscribers who never log in",
+      "explanation": "The project notes say most subscribers never log in, because boxes ship and bill automatically. The new job removes every account with no login in 90 days or no login at all. Those accounts are often active, paying customers. Removing an account also removes its subscription, so weekly boxes stop and billing for those customers ends, starting with the first night the job runs. Because the job runs every night, the loss would keep growing. Do not ship this. Remove the new schedule line and get the owner's approval for any cleanup rule that excludes active subscribers.",
+      "where": [
+        "jobs/cleanup.py",
+        "jobs/schedule.py",
+        "db/schema.sql",
+        "README.md"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "legal",
+      "title": "Order history is deleted along with the account",
+      "explanation": "Each customer's order records are linked to their account and are removed with it, so past payments and purchases would vanish from the database. Businesses often must keep payment and sales records for accounting or tax purposes for several years. Deleting them early could break those rules and make refund or dispute questions impossible to answer. This needs a check with whoever handles accounts and tax.",
+      "where": [
+        "jobs/cleanup.py",
+        "db/schema.sql"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Will this job delete any account that has an active subscription? If yes, why is that intended?",
+    "Can deleted accounts, subscriptions and orders be restored from backups? If so, how long does a restore take?",
+    "Does the shipments table also delete rows when a subscription is removed? (It is not in the schema file we reviewed, so this could not be checked.)",
+    "Which time zone is the 3 AM run based on? Is it set to run when the fewest customers are active?",
+    "Is there a record-keeping rule that says how long order records must be kept, and does this job respect it?"
+  ],
+  "good_news": [
+    "The change is small and easy to undo. Removing the one line in the schedule file stops the job.",
+    "The part that removes expired login sessions does not affect customers or payments."
+  ],
+  "files_reviewed": [
+    "jobs/cleanup.py",
+    "jobs/schedule.py"
+  ],
+  "truncated": false
+}

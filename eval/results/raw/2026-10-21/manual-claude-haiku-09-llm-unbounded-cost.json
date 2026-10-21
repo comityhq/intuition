@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-45-ba6efe",
+  "created_at": "2026-10-21T19:15:45.575Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/09-llm-unbounded-cost",
+  "base": "c2a22d003a49adef1316b9d4ec226cb86ea746c3",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The change adds an AI job that re-summarizes every support ticket every minute, which could run up large bills.",
+  "what_changed": [
+    "Every minute, the system will ask an outside AI service (OpenAI) to write a three-sentence summary of every support ticket.",
+    "The summaries are saved on each ticket and shown as short previews in the inbox.",
+    "Tickets are re-summarized on every run, even when nothing has changed since the last one.",
+    "Each ticket's full conversation text is sent to the AI company each time.",
+    "The existing nightly job that closes stale tickets is not changed."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Paid AI calls for every ticket, every minute",
+      "explanation": "The job runs every minute and sends every ticket to the paid AI service on each run, with no check for new or changed tickets and no daily limit. That is about 1,440 runs a day, so 1,000 tickets would mean roughly 1.4 million paid requests a day. Bills could grow quickly, and runs can pile up if one run is still going when the next starts. Fix: summarize a ticket only when it gets a new message, run far less often, and set a spending limit with the AI provider.",
+      "where": [
+        "src/scheduler.js",
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "reliability",
+      "title": "Endless retries and no limit when the AI service fails",
+      "explanation": "If the AI service is down, the key is wrong, or the account runs out of credit, the code retries forever with no pause, and every retry can still be billed. Summaries longer than 280 characters are also sent back for another summary with no limit on how many times. All tickets are sent at once, which can trigger the provider's rate limits and cause more failures. Fix: cap the retries, add a pause between them, and limit how many requests run at the same time.",
+      "where": [
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "privacy",
+      "title": "Full customer conversations sent to an outside AI company",
+      "explanation": "Every ticket's complete message history is sent to OpenAI every minute. Customers may not expect their support conversations to go to a third-party AI company, and this may not match the privacy policy or the terms with the provider. Before shipping, confirm that the privacy policy allows this and that the contract covers this use. Consider sending only what is needed for a short summary.",
+      "where": [
+        "src/jobs/summarizeTickets.js"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "How many support tickets exist today, and how many new messages arrive each day? Please estimate the monthly AI bill for this job before it goes live.",
+    "Can the summary be created once per ticket and redone only when a new message arrives, instead of every minute?",
+    "What happens when the AI service is down or out of credit? Can the job stop after a few tries and wait before trying again?",
+    "Does the tickets table already have a summary column? If not, the save step will fail on every run. Also, does our privacy policy and contract with OpenAI allow sending customer conversations to them?"
+  ],
+  "good_news": [
+    "The change is small: two files and 37 added lines, which makes it easy to review and to undo.",
+    "The job only writes a summary field. It does not email customers or change ticket status.",
+    "The existing nightly ticket-closing job is left alone."
+  ],
+  "files_reviewed": [
+    "src/jobs/summarizeTickets.js",
+    "src/scheduler.js"
+  ],
+  "truncated": false
+}

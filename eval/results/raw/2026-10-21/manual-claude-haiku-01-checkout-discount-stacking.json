@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-01-08180e",
+  "created_at": "2026-10-21T19:15:01.739Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/01-checkout-discount-stacking",
+  "base": "b44719f2d200bb903235e9388d699a072fef5052",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Customers can now stack several promo codes on one order, but there are no limits, so totals can drop below zero.",
+  "what_changed": [
+    "Customers can now use more than one promo code on the same order. Before, only one code was allowed per order.",
+    "The checkout total adds up the discounts from every code entered. Two codes now take money off together.",
+    "A new test checks that a referral code and a spring sale code work together. It shows 40% off a 40 dollar order.",
+    "The change does not stop the same code from being entered more than once. It also does not cap the total discount.",
+    "Any code can now be combined with any other code. This includes the staff code, which gives 50% off."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Same code can be reused, so orders can go free or negative",
+      "explanation": "The code adds each promo to a list with no check for duplicates and no cap on the total. A customer can enter the same 15% referral code three times and get 45% off. Enter the 50% staff code three times and the discount reaches 150%, so the order total becomes negative. Nothing stops the total from going below zero. If checkout charges that total, the store could pay customers money or give away orders for free. Promo codes are shared with customers, so this is likely to be found. Fix: block repeat codes, set a maximum total discount, and make sure the total can never go below zero before this ships.",
+      "where": [
+        "src/cart/discounts.js",
+        "src/cart/total.js",
+        "src/cart/promoCodes.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Staff discount can now be combined with customer codes",
+      "explanation": "The 50% staff code has no restriction, and the new code does not check the referral flag that the referral code uses. Any customer who gets hold of the staff code can now stack it with the spring and welcome codes. This makes the staff code much more valuable to misuse. Our reading of the intent is inferred from the code names, so the developer should confirm it. Fix: keep the staff code out of stacking, or limit stacking to the pairs that were agreed.",
+      "where": [
+        "src/cart/promoCodes.js",
+        "src/cart/discounts.js"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Should the same promo code be allowed more than once on one order? If not, can you block repeats?",
+    "What is the largest total discount an order can get? Can you cap it, for example at 50% off, and make sure the total never goes below zero?",
+    "Is the 50% staff code meant to be combined with customer codes? If not, can it be excluded from stacking?",
+    "Does checkout charge exactly the total this calculation produces? What happens if that total is zero or negative?"
+  ],
+  "good_news": [
+    "The change is small and limited to the discount code files.",
+    "The old single-code behaviour still works, and the existing single-code test still applies.",
+    "A new test covers the combined referral and spring sale case."
+  ],
+  "files_reviewed": [
+    "src/cart/discounts.js",
+    "src/cart/store.js",
+    "test/discounts.test.js"
+  ],
+  "truncated": false
+}

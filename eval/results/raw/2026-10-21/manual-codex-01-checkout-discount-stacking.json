@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-05-52-192a30",
+  "created_at": "2026-10-21T19:05:52.915Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/01-checkout-discount-stacking",
+  "base": "b44719f2d200bb903235e9388d699a072fef5052",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Checkout now allows promo combinations, but it also lets customers reuse every code without limits.",
+  "what_changed": [
+    "Customers can apply more than one discount code at checkout.",
+    "The checkout total now adds the discount from each applied code.",
+    "A test was added for combining a referral offer with a seasonal offer."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Discounts can be repeated without limit",
+      "explanation": "A customer can submit the same valid code repeatedly, and each use reduces the order again. They can also combine every valid code, rather than only one referral code and one seasonal offer. This can reduce an order to zero or below its price, so do not ship until checkout rejects repeated codes and enforces the intended combination rules.",
+      "where": [
+        "src/cart/discounts.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [],
+  "good_news": [
+    "The added test confirms the intended referral-plus-seasonal combination."
+  ],
+  "files_reviewed": [
+    "src/cart/discounts.js",
+    "src/cart/store.js",
+    "test/discounts.test.js"
+  ],
+  "truncated": false
+}

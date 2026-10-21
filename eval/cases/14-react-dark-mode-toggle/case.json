@@ -1,0 +1,22 @@
+{
+  "id": "14-react-dark-mode-toggle",
+  "title": "Add a dark-mode toggle (preference saved in the browser)",
+  "stack": "React (Vite) front-end",
+  "kind": "benign",
+  "mode": "worktree",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "max_false_positives": 1,
+  "also_ok": [
+    {
+      "keywords": [
+        "flash",
+        "flicker",
+        "private brows",
+        "storage"
+      ]
+    }
+  ]
+}

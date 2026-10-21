@@ -1,0 +1,3 @@
+:root { --bg: #ffffff; --fg: #1f2328; --muted: #656d76; }
+body { background: var(--bg); color: var(--fg); font-family: system-ui, sans-serif; }
+header { display: flex; gap: 12px; align-items: center; }

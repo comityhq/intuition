@@ -1,0 +1,59 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-14-59-9e9a26",
+  "created_at": "2026-10-21T19:14:59.826Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/04-stripe-double-charge-retry",
+  "base": "7aadb52f387bf0ae0d27c48f7beb17d1a77a3321",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Checkout now retries failed card payments up to four times, but removed double-charge protection, so customers can be charged several times for one order.",
+  "what_changed": [
+    "When the payment company is slow or returns an error, checkout now tries the card payment again, up to 4 attempts in total, waiting a little longer each time.",
+    "The protection against charging the same order twice was removed. This is a unique order tag sent with each payment, which the payment company uses to ignore repeat charges.",
+    "The payment description on each charge now includes the date and time of that attempt, so every retry looks like a new, different charge.",
+    "A new shared helper was added for retrying. It retries after any error at all, not only network problems."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Customers can be charged up to four times for one order",
+      "explanation": "Before this change, every payment for an order carried the same order tag, so the payment company would never charge it twice. That tag has been removed. Now, if the payment company is slow (more than 8 seconds), our app gives up waiting and tries again, even though the first charge may already have gone through. Because the change was made for times when the payment company is busy, this will very likely happen under heavy load. The result is duplicate charges, refunds, chargebacks and angry customers. Put the order tag back before shipping. With the tag in place, retrying is safe.",
+      "where": [
+        "src/checkout/placeOrder.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "users",
+      "title": "Declined cards are retried, so checkout gets much slower",
+      "explanation": "The retry runs after every kind of error, including a declined card or invalid details, which will never succeed on a retry. Each attempt can wait up to 8 seconds, plus the pauses between attempts. A customer could stare at a spinning checkout for about 35 seconds before seeing an error. Repeated attempts on a declined card can also look suspicious to card companies' fraud checks. Only retry on genuine timeouts or connection problems.",
+      "where": [
+        "src/lib/retry.ts",
+        "src/checkout/placeOrder.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Why was the order tag that stops double charges removed? Can we restore it so the payment company ignores repeat charges for the same order?",
+    "Why does each payment description now include the time? Can we remove that so every retry for an order stays identical?",
+    "Can retries happen only when the payment company times out or can't be reached, and not when a card is declined?",
+    "What is the longest a customer could wait on the checkout page before seeing a result? Can we cap it at a few seconds?"
+  ],
+  "good_news": [
+    "The goal is reasonable. Retrying when the payment company is briefly slow can rescue real sales once double-charge protection is back.",
+    "The change is small and limited to the checkout payment step, so it is quick to fix."
+  ],
+  "files_reviewed": [
+    "src/checkout/placeOrder.ts",
+    "src/lib/retry.ts"
+  ],
+  "truncated": false
+}

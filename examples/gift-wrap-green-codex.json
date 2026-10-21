@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "id": "2026-10-21T18-24-14-8a3db2",
+  "created_at": "2026-10-21T18:24:14.266Z",
+  "repo": "/Users/founder/tiny-shop",
+  "base": "30fe482c64e800641c650763681ae43515a21ad3",
+  "head": "c9cf673319486b6c8150b0b8b54e0e2761a95aed",
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": "01a15fb3-dac8-7670-82d8-773ca33f883d"
+  },
+  "verdict": "green",
+  "headline": "Gift wrapping is now optional at checkout, recorded with each order, and adds a $3 fee before tax.",
+  "what_changed": [
+    "Customers or checkout integrations can select gift wrapping during checkout.",
+    "A selected wrap adds $3 to the amount before the existing 20% tax, so its effect on the final total is $3.60.",
+    "Staff can see whether an order requested gift wrapping in the saved order record.",
+    "The change was tested both for pricing and with a checkout request."
+  ],
+  "risks": [
+    {
+      "level": "low",
+      "category": "money",
+      "title": "Text value may enable wrapping",
+      "explanation": "The checkout accepts any non-empty value as a request for gift wrapping. An integration that sends the text \"false\" instead of a real yes/no value would still charge for wrapping. This is unlikely with a properly built checkout, but the developer should accept only an explicit true value.",
+      "where": [
+        "src/server.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Should gift wrapping be taxed? The current change taxes it, making the final customer charge $3.60 rather than exactly $3.00."
+  ],
+  "good_news": [
+    "The change is small and contained.",
+    "Orders retain the gift-wrap choice, which supports fulfilment.",
+    "Existing pricing behaviour remains covered by tests."
+  ],
+  "files_reviewed": [
+    "src/orders.js",
+    "src/pricing.js",
+    "src/server.js",
+    "test/pricing.test.js"
+  ],
+  "truncated": false
+}

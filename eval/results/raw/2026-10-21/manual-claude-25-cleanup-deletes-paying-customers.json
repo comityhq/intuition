@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-17-06-e6b8a6",
+  "created_at": "2026-10-21T19:17:06.420Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/25-cleanup-deletes-paying-customers",
+  "base": "fd1cbfe84a4af6b4c8f73bdcae039458a7327588",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "A new nightly cleanup permanently deletes customers who haven't logged in for 90 days, including active paying subscribers. Don't ship this.",
+  "what_changed": [
+    "A new automatic job now runs every night at 3am (server time) to shrink the database and cut the hosting bill.",
+    "It removes expired login sessions. This part is harmless: those people would have to log in again anyway.",
+    "It also permanently deletes any customer account with no login in the last 90 days, plus any account that has never logged in at all.",
+    "Deleting a customer also deletes their subscription and their whole order history. The database is set up to remove these automatically along with the account."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "data",
+      "title": "Active paying subscribers will be permanently deleted",
+      "explanation": "The project notes say most subscribers never log in, because boxes ship and bill automatically. This job deletes everyone with no login in 90 days, and everyone who has never logged in, without checking whether they still have an active subscription. On the first night it will likely wipe out most of your paying customers, along with their subscriptions and order history. Nothing in the change makes a copy first or lets you undo it, and each instruction takes effect as soon as it runs.",
+      "where": [
+        "jobs/cleanup.py",
+        "jobs/schedule.py",
+        "db/schema.sql"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Weekly box shipments and billing will stop for those customers",
+      "explanation": "The Monday shipping job only sends boxes for subscriptions that are still in the database. Once the cleanup deletes a customer, their subscription is gone too, so their box stops arriving and they can no longer be billed. Customers who are still paying you would quietly lose their service, which means lost revenue, complaints and damaged trust.",
+      "where": [
+        "jobs/cleanup.py",
+        "jobs/weekly_boxes.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "legal",
+      "title": "Order and payment records are destroyed",
+      "explanation": "Each deleted customer's full order history is removed with them. You usually have to keep sales and payment records for tax and accounting, often for several years. Customers who complain or ask for a refund would have no record left to check. Any data cleanup should keep order records or archive them first.",
+      "where": [
+        "jobs/cleanup.py",
+        "db/schema.sql"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you change the cleanup so it never deletes a customer with an active or paused subscription, or anyone with orders we must keep for tax?",
+    "Can we start with only the expired-session cleanup, and leave customer accounts alone until we agree a written rule for which accounts can be removed?",
+    "Before any customer data is deleted, can the job first save a copy (an archive) and report how many accounts it would remove, so we can check the number?",
+    "How much space do these tables really use? Is deleting customers actually what is driving the hosting bill up?"
+  ],
+  "good_news": [
+    "Clearing out expired login sessions is safe, and it is a sensible way to save space.",
+    "The change is small and has not been committed or published yet, so it is easy to fix before it causes any harm."
+  ],
+  "files_reviewed": [
+    "jobs/cleanup.py",
+    "jobs/schedule.py"
+  ],
+  "truncated": false
+}

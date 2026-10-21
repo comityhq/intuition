@@ -1,0 +1,69 @@
+{
+  "id": "16-refund-overpay-buried",
+  "title": "Partial refunds from support dashboard: remaining-balance check dropped (buried in a mixed diff)",
+  "stack": "TypeScript / Node",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "support can refund more than the customer paid / refund the same order repeatedly",
+      "categories": [
+        "money",
+        "security"
+      ],
+      "files": [
+        "src/refunds/refund.ts"
+      ],
+      "keywords": [
+        "more than",
+        "over-refund",
+        "overrefund",
+        "repeatedly",
+        "again",
+        "twice",
+        "multiple",
+        "exceed",
+        "more money",
+        "unlimited",
+        "no limit",
+        "any amount",
+        "already refunded"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "negative",
+        "minus",
+        "zero"
+      ]
+    },
+    {
+      "keywords": [
+        "reason",
+        "audit",
+        "who"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "keywords": [
+        "records",
+        "disagree",
+        "payment company",
+        "reconcil",
+        "out of sync"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-10-e3ce97",
+  "created_at": "2026-10-21T19:16:10.969Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/15-fastapi-own-invoices-csv",
+  "base": "855bf98a09ef100933d44d1f15d15b48d0076633",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "Customers can now download their own invoices as a spreadsheet file, and each customer only gets their own invoices.",
+  "what_changed": [
+    "Signed-in customers get a new download link in the portal. It gives them a spreadsheet file (CSV) of all their invoices, ready to send to their accountant.",
+    "The file lists the invoice number, issue date, total in normal currency format (for example 199.00), and status (paid, open or void). Newest invoices come first.",
+    "The existing invoice list works the same as before. The developer moved its database lookup into one shared piece that both the list and the download now use.",
+    "A small automatic test was added for the download."
+  ],
+  "risks": [
+    {
+      "level": "low",
+      "category": "reliability",
+      "title": "The new test checks very little",
+      "explanation": "The test only checks that the reply is marked as a spreadsheet file. It never checks what is inside the file, such as the header row or the amounts. If someone later breaks the contents, for example by showing totals wrong, the test would still pass. Ask the developer to make the test check the actual rows.",
+      "where": [
+        "tests/test_invoices_csv.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you extend the new test so it checks the file's contents, such as the header row and a total showing as 199.00, not just the file type?",
+    "Should cancelled ('void') invoices be in the accountant's spreadsheet, or should they be left out or marked more clearly?"
+  ],
+  "good_news": [
+    "The download uses the same sign-in check and the same 'only this customer's invoices' filter as the existing invoice list. One customer cannot download another customer's invoices.",
+    "The change is small and contained. The existing invoice list behaves exactly as it did before.",
+    "Amounts are converted from cents to normal currency with two decimal places, which is what an accountant will expect."
+  ],
+  "files_reviewed": [
+    "app/routes_invoices.py",
+    "tests/test_invoices_csv.py"
+  ],
+  "truncated": false
+}

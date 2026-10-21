@@ -1,0 +1,84 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-46-a1d752",
+  "created_at": "2026-10-21T19:16:46.087Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/20-large-diff-public-export",
+  "base": "8c5c2e86d84a49bbaba76c363ea6434adef223a1",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "This adds a sales chart and a customer list download, but anyone on the internet can download the full customer list without signing in.",
+  "what_changed": [
+    "The main page now shows a space for a monthly spending chart and a \"Download customer list\" link.",
+    "A new download gives every customer's name, email, phone, birthday and total lifetime spend as a spreadsheet file.",
+    "A new web address the app answers gives monthly sales totals across all orders.",
+    "Chart-drawing add-on code (labelled \"chartkit\") was copied straight into the website files instead of being installed from a known source."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Full customer list downloadable by anyone, no sign-in",
+      "explanation": "The existing customer pages require staff to sign in first. The new reports section skips that check. Anyone who visits the download link gets every customer's name, email, phone, birthday and spending. The link is shown on the public front page, so finding it is easy. That is a personal data breach you may have to report under privacy laws such as GDPR. Have the developer add the same staff sign-in check before publishing.",
+      "where": [
+        "src/server.js",
+        "src/routes/reports.js",
+        "public/index.html"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Company sales figures are also public",
+      "explanation": "The monthly sales totals use the same unprotected setup. Anyone, including competitors, can see your revenue month by month. The same sign-in fix covers this.",
+      "where": [
+        "src/server.js",
+        "src/routes/reports.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "security",
+      "title": "Unverified chart add-on code with an unclear origin",
+      "explanation": "A large, scrambled file of chart code was added directly to the site, and it loads for every visitor. I found no signs of it sending data elsewhere. But its contents look like meaningless filler rather than a real charting tool, and nothing on the page uses it yet. Ask where it came from and replace it with an official, checkable copy, or remove it.",
+      "where": [
+        "public/vendor/chartkit.min.js",
+        "public/index.html"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "level": "low",
+      "category": "data",
+      "title": "Spreadsheet can break on names containing commas",
+      "explanation": "Customer details are joined with commas, with no protection. A name like \"Smith, Jane\" will shift columns and confuse your accountant's file. Also, a value starting with \"=\" could run as a formula when opened in Excel. Ask the developer to format the file properly.",
+      "where": [
+        "src/routes/reports.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you put the same staff sign-in check on the new reports section that the customer pages already use, and confirm the download fails when signed out?",
+    "Where did the chartkit file come from? Can we use an official, verified copy instead, since this file looks scrambled and nothing uses it yet?",
+    "Does the accountant really need customers' birthdays and phone numbers, or can we leave those out of the download?",
+    "Can the spreadsheet handle commas and quote marks in names, and block values that Excel would treat as formulas?"
+  ],
+  "good_news": [
+    "The change is small and easy to fix: one missing sign-in check is the main problem.",
+    "The database instructions are fixed text and don't include anything visitors type, so they can't be tampered with that way."
+  ],
+  "files_reviewed": [
+    "public/index.html",
+    "public/vendor/chartkit.min.js",
+    "src/routes/reports.js",
+    "src/server.js"
+  ],
+  "truncated": false
+}

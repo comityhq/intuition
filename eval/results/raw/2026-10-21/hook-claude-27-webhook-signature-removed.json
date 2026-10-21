@@ -1,0 +1,69 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-12-8d9d65",
+  "created_at": "2026-10-21T19:16:12.362Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/hook-20261021T191307/27-webhook-signature-removed",
+  "base": "054a11d9fd1b0b0787c4604537e657db93aa9f0c",
+  "head": "f98d98f6aaf5d1b1c0e8fe4b0c22b9fc3c963eb6",
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": "795334d4-a2c4-4599-8a0d-36693960665f"
+  },
+  "verdict": "red",
+  "headline": "The payment notification check was switched off, so anyone online can mark an order paid and get it printed for free.",
+  "what_changed": [
+    "The web address that the payment provider uses to report successful payments no longer checks that the message really came from the provider.",
+    "Orders stuck since the move to the new load balancer (the server that sits in front of the app and passes traffic to it) should start moving again, because real payment messages will no longer be rejected.",
+    "Every payment message is now written to the server's log, with the event type and order number.",
+    "The change was saved on a separate branch and not published. A note in the save history says the owner accepted the risk and the check must come back later."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Anyone can fake a payment and get orders printed free",
+      "explanation": "Before this change, the app only trusted a payment message if it carried a secret signature from the provider. Now it trusts any message that says a payment succeeded. Anyone who finds this web address can send one fake message with an order number, and that order is marked paid and sent to the print partner. You pay the print costs and never receive the customer's money. This is easy to do and needs no special access, so limit it right away (see questions) and bring the check back as soon as possible.",
+      "where": [
+        "src/webhooks/payments.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "The same order can be sent to the printer repeatedly",
+      "explanation": "The step that marks an order paid doesn't check whether the order was already paid. Each repeated 'payment succeeded' message sends the order to the print partner again. That was already true before, but only the real provider could send such messages. Now anyone can send them over and over, so one order could be printed many times at your cost.",
+      "where": [
+        "src/webhooks/payments.js",
+        "src/orders.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "reliability",
+      "title": "A badly formed message can leave the connection hanging",
+      "explanation": "If a message claims a payment succeeded but leaves out the order details, the app hits an error it doesn't handle, and the sender gets no reply. Real orders aren't harmed. But it makes junk or hostile traffic noisier and harder to spot in the logs.",
+      "where": [
+        "src/webhooks/payments.js"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can we set the load balancer to accept payment messages only from the payment provider's published internet addresses, starting tonight?",
+    "Can the load balancer pass payment messages through completely unchanged for this one web address, so we can switch the signature check back on? When can that be done?",
+    "Until the check is back, can the app confirm each payment with the payment provider directly before marking an order paid and sending it to print?",
+    "Can we stop an order from being sent to the printer a second time if it's already marked paid?"
+  ],
+  "good_news": [
+    "The change is small and only touches the payment notification handling, so it's easy to undo once the load balancer is fixed.",
+    "The code that checks the signature is still in the project, ready to switch back on.",
+    "The work is on its own branch with a clear note about the accepted risk, so it can't slip into the main version unnoticed."
+  ],
+  "files_reviewed": [
+    "src/webhooks/payments.js"
+  ],
+  "truncated": false
+}

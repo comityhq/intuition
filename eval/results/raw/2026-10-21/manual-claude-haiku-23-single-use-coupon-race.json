@@ -1,0 +1,71 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-51-f080bd",
+  "created_at": "2026-10-21T19:16:51.442Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/23-single-use-coupon-race",
+  "base": "a4b7b8cfc65469170eb6026dadc7a4cf86aa8b36",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Adds a coupon field to orders, but the single-use check can be beaten by two requests at once.",
+  "what_changed": [
+    "Customers can now type a coupon code into their order, and the discount is added to the order total.",
+    "Each coupon is meant to work once. Partner coupons are worth $100 off and are given to VIP guests.",
+    "The code trims spaces and turns the coupon code into capitals before checking it.",
+    "A missing or unknown code, or a code already used, gives the customer a short error message.",
+    "No emails, texts or customer messages are sent by this change."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Same $100 coupon can be used twice at the same moment",
+      "explanation": "The system first checks whether the coupon is unused, then marks it used in a separate step. If two requests with the same code arrive at nearly the same time, both can pass the check before either marks it used. The same guest could then get the $100 off twice, or a guest could share a code and have several people use it. Partner coupons are meant to be single-use, so this is lost revenue. It is most likely with double-clicks, retries, or a code shared in a group chat. Fix by making the check and the mark-as-used one step that the database guarantees, for example a conditional update that only succeeds if the coupon is still unused, inside a transaction.",
+      "where": [
+        "src/coupons/redeem.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Coupon is used up even if the order does not exist",
+      "explanation": "The discount is added to the order without first checking that the order exists. If the order number is wrong or missing, the update changes nothing, but the coupon is still marked as used. The customer then has a dead coupon and no discount. This can happen with a typo or a stale order number, and the customer gets no error. Fix by checking that the order exists before using the coupon, and doing both steps together so one cannot succeed without the other.",
+      "where": [
+        "src/coupons/redeem.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "One order can stack several coupons",
+      "explanation": "Nothing stops an order from taking a second or third coupon. Each one adds another $100 off the same total. A guest with several codes could pay much less than intended, and the total could go below what the product should cost. This is likely unintended unless the business has decided that coupons can stack. Fix by allowing only one coupon per order, or by stating the stacking rule and enforcing it.",
+      "where": [
+        "src/coupons/redeem.js",
+        "src/server.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "If two requests use the same coupon code at the same moment, can both be accepted? Please make the check and the mark-as-used a single step that the database enforces, and test it with two simultaneous requests.",
+    "Should an order be allowed to use more than one coupon? If not, please block a second coupon on the same order.",
+    "Should the system confirm that the order exists, and is still unpaid, before it uses a coupon? Right now a coupon can be used up on an order number that does not exist.",
+    "Anyone who knows an order number and a coupon code can apply the coupon. Is that acceptable, or should the system check that the request comes from the buyer of that order? The payment step has the same gap, so this may need a wider fix."
+  ],
+  "good_news": [
+    "The change is small and contained, touching only the new coupon file and one new route.",
+    "Invalid codes and used codes are rejected with a clear message instead of crashing.",
+    "The code cleans up spaces and capitals before the lookup, so typing mistakes are less likely to block valid codes."
+  ],
+  "files_reviewed": [
+    "src/coupons/redeem.js",
+    "src/server.js"
+  ],
+  "truncated": false
+}

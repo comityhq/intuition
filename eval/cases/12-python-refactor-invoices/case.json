@@ -1,0 +1,13 @@
+{
+  "id": "12-python-refactor-invoices",
+  "title": "Refactor: extract duplicated money formatting into a helper (no behaviour change)",
+  "stack": "Python / FastAPI service",
+  "kind": "benign",
+  "mode": "commit",
+  "commit_message": "Refactor invoice rendering: share money formatting helper, add type hints",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "max_false_positives": 1
+}

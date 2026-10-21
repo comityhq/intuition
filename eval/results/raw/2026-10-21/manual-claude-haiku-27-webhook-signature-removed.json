@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-17-20-746662",
+  "created_at": "2026-10-21T19:17:20.044Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/27-webhook-signature-removed",
+  "base": "62d8fc7709d6b1458d92aabcdcaf5101c184952b",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The check that confirms payment notices are genuine was switched off, so fake payment messages can now mark orders paid and ship them.",
+  "what_changed": [
+    "The address that receives payment notices from the payment provider no longer checks that each notice is genuine.",
+    "Any message sent to that address is now accepted as a real payment if it has the right shape.",
+    "A matching order is marked paid and sent to the print partner for fulfilment, as before.",
+    "Each incoming notice is now written to the log, including its type and order number.",
+    "The developer's stated reason is that a new load balancer changes the message, so the check failed. The check was turned off rather than fixed."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "security",
+      "title": "Anyone can fake a payment and trigger free shipments",
+      "explanation": "The payment notice address now accepts messages from anyone on the internet, with no proof they came from the payment provider. Someone who knows or guesses an order number can send a fake 'payment succeeded' message. The order is then marked paid and sent to the print partner, so goods ship without payment. This is likely if order numbers are easy to guess, which we have not checked. Fix: restore the check and correct the load balancer so the original message reaches the app unchanged.",
+      "where": [
+        "src/webhooks/payments.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can we turn the payment notice signature check back on before release, and fix the load balancer so it passes the original message through unchanged?",
+    "Can you show a test where a notice with a missing or wrong signature is rejected?",
+    "Are order numbers random and hard to guess, or are they simple counting numbers? If they are simple, can they be made random?",
+    "Does marking an order paid check that the amount received matches the order total? If not, can that check be added?"
+  ],
+  "good_news": [
+    "The change touches only one file, so the fix is contained.",
+    "The original check code still exists in the project, so restoring it should be quick."
+  ],
+  "files_reviewed": [
+    "src/webhooks/payments.js"
+  ],
+  "truncated": false
+}

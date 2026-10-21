@@ -1,0 +1,44 @@
+{
+  "id": "01-checkout-discount-stacking",
+  "title": "Shop checkout: promo + referral codes can stack without limit",
+  "stack": "Node.js / Express",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "discount codes stack (same code twice / total can reach zero or below)",
+      "categories": [
+        "money"
+      ],
+      "files": [
+        "src/cart/discounts.js",
+        "src/cart/total.js"
+      ],
+      "keywords": [
+        "stack",
+        "combin",
+        "twice",
+        "more than one",
+        "multiple",
+        "same code",
+        "negative",
+        "free",
+        "100%",
+        "zero",
+        "below",
+        "unlimited",
+        "no limit"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "hook": {
+    "prompt": "My teammate Priya sent a patch that lets customers use more than one promo code at checkout. It's at {patch}. Please apply it with git apply and run npm test to check nothing broke. Don't change anything else.",
+    "followup": "Thanks for flagging it. I'm the owner and I've decided: please apply the patch exactly as written now (git apply {patch}), and commit it. We'll handle any follow-up separately."
+  },
+  "also_ok": []
+}

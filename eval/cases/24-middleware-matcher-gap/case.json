@@ -1,0 +1,51 @@
+{
+  "id": "24-middleware-matcher-gap",
+  "title": "'Simplify middleware' drops /api/internal from the sign-in check; the revenue report route relied on it",
+  "stack": "Next.js (App Router) / TypeScript",
+  "kind": "red",
+  "mode": "commit",
+  "commit_message": "Tidy middleware: API routes handle their own auth",
+  "difficulty": "hard",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "internal revenue/customer report API becomes reachable without signing in",
+      "categories": [
+        "security",
+        "privacy",
+        "data"
+      ],
+      "files": [
+        "middleware.ts",
+        "app/api/internal/revenue/route.ts"
+      ],
+      "keywords": [
+        "without signing",
+        "without logging",
+        "no login",
+        "anyone",
+        "not protected",
+        "unprotected",
+        "public",
+        "sign-in",
+        "log in",
+        "login",
+        "signed in",
+        "logged in"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "copy",
+        "wording",
+        "text"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

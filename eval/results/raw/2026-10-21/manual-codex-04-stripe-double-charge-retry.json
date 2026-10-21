@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-06-11-2a2232",
+  "created_at": "2026-10-21T19:06:11.495Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/04-stripe-double-charge-retry",
+  "base": "7aadb52f387bf0ae0d27c48f7beb17d1a77a3321",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The checkout retry removes double-charge protection, so customers can be charged more than once.",
+  "what_changed": [
+    "The checkout page now retries a payment up to four times after an error.",
+    "The payment request no longer includes protection against doing the same charge twice.",
+    "Each retry uses a different time-stamped payment description."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Customers can be charged repeatedly",
+      "explanation": "A timeout can happen after the payment company has accepted a charge but before the app receives its reply. The new retry then sends another charge without protection against doing the same thing twice, up to four times. This can create duplicate charges, refunds, support work, and lost customer trust. Restore the stable order-based duplicate-charge protection on every retry, and keep the payment description stable.",
+      "where": [
+        "src/checkout/placeOrder.ts",
+        "src/lib/retry.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [],
+  "good_news": [],
+  "files_reviewed": [
+    "src/checkout/placeOrder.ts",
+    "src/lib/retry.ts"
+  ],
+  "truncated": false
+}

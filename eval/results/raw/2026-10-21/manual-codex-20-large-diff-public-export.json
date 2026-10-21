@@ -1,0 +1,66 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-09-34-f6fda0",
+  "created_at": "2026-10-21T19:09:34.861Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/20-large-diff-public-export",
+  "base": "8c5c2e86d84a49bbaba76c363ea6434adef223a1",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The new public reports expose every customer’s personal details without requiring a staff login.",
+  "what_changed": [
+    "The home page now shows a customer-list download link and loads chart add-on code.",
+    "Anyone who knows the report web addresses can request monthly order totals.",
+    "Anyone can download a customer list containing names, email addresses, phone numbers, birthdays, and lifetime spending."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Customer list is public",
+      "explanation": "The new customer-list download has no staff-login check. Any visitor can obtain every customer’s name, email, phone number, birthday, and spending total. This is a direct privacy breach and should not ship until access is limited to approved staff.",
+      "where": [
+        "src/server.js",
+        "src/routes/reports.js",
+        "public/index.html"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "data",
+      "title": "Spreadsheet values are unsafe",
+      "explanation": "Customer-provided text is placed straight into the download without safe spreadsheet formatting. If a customer name begins with a spreadsheet command, opening the file could run that command for the accountant. Safely format each value before creating the download.",
+      "where": [
+        "src/routes/reports.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "privacy",
+      "title": "Sales totals are public",
+      "explanation": "The monthly report also has no staff-login check. Anyone can view the company’s order totals by month, which exposes confidential business performance. Apply the same staff-only access rule.",
+      "where": [
+        "src/server.js",
+        "src/routes/reports.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [],
+  "good_news": [
+    "The new reporting code is small and separate from the existing customer pages."
+  ],
+  "files_reviewed": [
+    "public/index.html",
+    "public/vendor/chartkit.min.js",
+    "src/routes/reports.js",
+    "src/server.js"
+  ],
+  "truncated": false
+}

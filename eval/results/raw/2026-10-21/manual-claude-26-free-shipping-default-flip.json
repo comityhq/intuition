@@ -1,0 +1,58 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-17-00-62f8ee",
+  "created_at": "2026-10-21T19:17:00.815Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/26-free-shipping-default-flip",
+  "base": "416a37fcdacc55da10d5632291e17ae288ac12c5",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Shipping settings were moved into one place, but free shipping now turns on for every order unless someone switches it off.",
+  "what_changed": [
+    "The shipping settings (free-shipping promo switch, the $75 free-shipping threshold and the $5.99 flat rate) now live in one shared settings file.",
+    "The free-shipping promo used to be off unless someone switched it on for promo weekends. Now it is on unless someone explicitly switches it off.",
+    "The $75 threshold for free shipping can now be changed through a setting without changing code. The $5.99 flat rate stays fixed.",
+    "The new settings file also holds the server's port and a currency setting. This goes beyond the shipping change."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Every order would get free shipping by default",
+      "explanation": "Before, free shipping for all orders only applied when the promo switch was set to \"true\". Now it applies unless the switch is set to exactly \"false\". The project notes say production only sets the port and the payment key, so the promo switch is not set there. Once published, every customer would pay $0 shipping on every order, and the shop would absorb the cost of every shipment until someone notices. Ask the developer to make the switch off by default again, as before.",
+      "where": [
+        "src/config.js",
+        "src/cart/shipping.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "money",
+      "title": "Free-shipping threshold could break with a mistyped setting",
+      "explanation": "The $75 free-shipping threshold can now be changed with a setting. If someone enters it with a typo or a dollar sign, the app cannot read it as a number. Orders under the threshold could then be charged $5.99 even when they should ship free. This only happens if someone sets the value wrongly, so it is unlikely.",
+      "where": [
+        "src/config.js"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you make the free-shipping promo off by default again, so it only turns on when we set it to \"true\" for promo weekends?",
+    "Was changing the promo from opt-in to opt-out intentional? The project notes still say to switch it on only during promo weekends.",
+    "If someone types the free-shipping threshold setting wrongly, what will customers be charged? Can the app fall back to $75?"
+  ],
+  "good_news": [
+    "Keeping all settings in one file makes them easier to find and review.",
+    "The $75 threshold and $5.99 flat rate keep the same values as before."
+  ],
+  "files_reviewed": [
+    "src/cart/shipping.js",
+    "src/config.js"
+  ],
+  "truncated": false
+}

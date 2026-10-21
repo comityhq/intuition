@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-10-50-06662b",
+  "created_at": "2026-10-21T19:10:50.892Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/23-single-use-coupon-race",
+  "base": "a4b7b8cfc65469170eb6026dadc7a4cf86aa8b36",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The new coupon feature can apply one single-use coupon more than once.",
+  "what_changed": [
+    "Customers can submit a coupon code for an order and receive its discount.",
+    "The app records the coupon as used after adding its value to the order."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Single-use coupons can be reused",
+      "explanation": "Two coupon requests that arrive at nearly the same time can both see the coupon as unused. Both can add the discount before either marks it used. A customer or automated tool could use one coupon on multiple orders, causing lost revenue. Make checking and claiming the coupon one all-or-nothing database action.",
+      "where": [
+        "src/coupons/redeem.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "money",
+      "title": "Failed request can leave discounts wrong",
+      "explanation": "The order discount and coupon record are changed separately. If the first change succeeds but the second fails, an order keeps its discount while the coupon still appears unused. It could then be used again. Make both changes succeed or fail together.",
+      "where": [
+        "src/coupons/redeem.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Does the database prevent a coupon from being marked used for an order that does not exist? The new coupon web address does not check this first."
+  ],
+  "good_news": [
+    "Coupon codes are cleaned up before use, which avoids accidental differences in spaces or letter case."
+  ],
+  "files_reviewed": [
+    "src/coupons/redeem.js",
+    "src/server.js"
+  ],
+  "truncated": false
+}

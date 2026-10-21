@@ -1,0 +1,72 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-28-59fabf",
+  "created_at": "2026-10-21T19:15:28.555Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/08-fastapi-pii-logging",
+  "base": "06cbc48cb55d2e31e589d1788607e3165dfb433d",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "New request logging copies every loan applicant's Social Security number and bank details to an outside log service. Do not ship.",
+  "what_changed": [
+    "Every visit to the app is now written to the logs in full. That includes everything the customer typed and the extra information their browser sent.",
+    "The stated goal is to help debug the problem with failed loan applications.",
+    "The logs already go to an outside company (Better Stack's Logtail), which keeps them for 30 days. So this new detail goes there too.",
+    "No other features or screens were changed."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "SSNs and bank account numbers sent to outside log service",
+      "explanation": "The loan application form collects the owner's full name, Social Security number, date of birth, bank account number and routing number. The new logging records the whole form, so every one of these goes in plain text to the outside log service and stays there for 30 days. This happens to every applicant, every time, starting the moment it ships. It is a likely breach of data-protection rules for lenders (for example US financial privacy rules and state breach laws), and anyone with access to the logs could steal identities. Log only safe details (which page, how long it took, the result), or hide the sensitive fields before logging.",
+      "where": [
+        "app/middleware/request_logging.py",
+        "app/routes/applications.py",
+        "app/logging_config.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "security",
+      "title": "Login passwords and session details also copied into logs",
+      "explanation": "The logging also records all the extra information sent with each request. That normally includes login tokens and cookies (the details that prove who a user is). Anyone who can read the logs could use these to act as a logged-in customer or staff member. Leave this extra information out of the logs, or keep only a few harmless items.",
+      "where": [
+        "app/middleware/request_logging.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "Every request may wait on the outside log service",
+      "explanation": "The existing log setup sends each log line to the outside service and waits up to 2 seconds for an answer. The new logging runs on every request, in a part of the app that cannot do other work while it waits. If the log service is slow, the whole app could slow down for all customers, including people submitting applications. Ask the developer to send logs in the background so customers never wait on them.",
+      "where": [
+        "app/middleware/request_logging.py",
+        "app/logging_config.py"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you change the logging so it never records Social Security numbers, dates of birth, bank account or routing numbers, or login details? Can you show me a sample log line to confirm?",
+    "Has any version of this already run anywhere (a test server or production)? If so, can we delete those logs from the outside log service and check whether we must report it?",
+    "Can we debug the failed applications by logging only the page, the result and the error message, instead of the full form?",
+    "Can logs be sent to the outside service in the background, so a slow log service never slows down customers?"
+  ],
+  "good_news": [
+    "The change is small and easy to undo. It is one new file plus two lines that switch it on.",
+    "The existing application page was careful to log only the business name and amount. Following that same approach would fix the main problem."
+  ],
+  "files_reviewed": [
+    "app/main.py",
+    "app/middleware/__init__.py",
+    "app/middleware/request_logging.py"
+  ],
+  "truncated": false
+}

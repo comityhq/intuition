@@ -1,0 +1,56 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-08-65690e",
+  "created_at": "2026-10-21T19:16:08.279Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/17-invoice-pdf-idor",
+  "base": "855bf98a09ef100933d44d1f15d15b48d0076633",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Customers can now download invoices as PDFs, but any logged-in customer can download anyone else's invoice.",
+  "what_changed": [
+    "Adds a \"download as PDF\" option for invoices, so customers can forward them to their accountant.",
+    "The PDF shows the invoice number, issue date, total and the billing email address.",
+    "The invoice list now includes each invoice's internal ID number. The new download link uses this number."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Any customer can download any other customer's invoice",
+      "explanation": "The new download address checks that someone is logged in. It never checks that the invoice belongs to them. Invoice ID numbers simply count up (1, 2, 3…), so a logged-in customer can change the number in the link and download every invoice in the system. Each PDF reveals another customer's email address, invoice amounts and dates. That is a personal data leak, which may need reporting under privacy laws such as GDPR. Fix this before shipping: only return the invoice if it belongs to the logged-in customer, the same way the existing invoice list already does.",
+      "where": [
+        "app/routes_invoices.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "reliability",
+      "title": "Some invoices may produce broken or unreadable PDFs",
+      "explanation": "The PDF is built by hand. Brackets in the invoice text are not handled, and the line breaks may not show up as separate lines. The file also leaves out some parts that PDF readers normally expect, such as a font and an index of its contents. Some PDF viewers or accounting tools may show a blank page or refuse to open it. Ask the developer to test the files in several common PDF viewers, or to use a standard PDF-making tool.",
+      "where": [
+        "app/pdf.py"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you make the PDF download refuse (with a 'not found' message) any invoice that doesn't belong to the logged-in customer, and add a test that proves customer A can't download customer B's invoice?",
+    "Has this download been live anywhere yet? If so, can we check the server records for people downloading invoices that aren't theirs?",
+    "Have you opened the generated PDFs in common viewers (Adobe, Chrome, Mac Preview) and checked that the lines display correctly?"
+  ],
+  "good_news": [
+    "The change is small and contained, so the fix for the main problem is a one-line ownership check.",
+    "The existing invoice list still correctly shows each customer only their own invoices."
+  ],
+  "files_reviewed": [
+    "app/pdf.py",
+    "app/routes_invoices.py"
+  ],
+  "truncated": false
+}

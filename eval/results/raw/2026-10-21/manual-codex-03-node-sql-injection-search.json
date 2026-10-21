@@ -1,0 +1,50 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-06-00-0b9308",
+  "created_at": "2026-10-21T19:06:00.959Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/03-node-sql-injection-search",
+  "base": "72cd86175e5c26aef7c2fdc14296f7f45182cc8a",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The new product search allows visitors to run harmful database instructions, so it should not ship yet.",
+  "what_changed": [
+    "Product search can now narrow results by category and sort results.",
+    "Search results now include each product's category.",
+    "When a search fails, the app sends the full database instruction back to the visitor."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "security",
+      "title": "Visitors can alter the database",
+      "explanation": "Search text, category, and sorting choices are placed directly into database instructions. Anyone who can reach product search can send crafted values that change those instructions. Depending on the database account's permissions, they could read data they should not see, change product records, or delete them. Keep visitor values separate from database instructions, and only allow a fixed list of sorting choices.",
+      "where": [
+        "src/routes/products.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "data",
+      "title": "Database details leak on errors",
+      "explanation": "If a search fails, the response includes both the error and the full database instruction. This gives an attacker useful details about the data structure and makes the first issue easier to exploit. Return a general error to visitors and keep detailed failure information only in protected staff logs.",
+      "where": [
+        "src/routes/products.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [],
+  "good_news": [
+    "The change is limited to the product-search web address."
+  ],
+  "files_reviewed": [
+    "src/routes/products.js"
+  ],
+  "truncated": false
+}

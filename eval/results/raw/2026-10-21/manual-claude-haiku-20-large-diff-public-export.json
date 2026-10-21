@@ -1,0 +1,74 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-37-87a1c1",
+  "created_at": "2026-10-21T19:16:37.826Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/20-large-diff-public-export",
+  "base": "8c5c2e86d84a49bbaba76c363ea6434adef223a1",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The change publishes a customer list with names, emails, phone numbers and birthdays to anyone who has the web address, with no staff login check.",
+  "what_changed": [
+    "A new \"Download customer list\" link appears on the front page of the CRM, so anyone who opens the site can see it.",
+    "The download is a spreadsheet file with each customer's name, email, phone, birthday and total lifetime spending, sorted by biggest spenders.",
+    "A monthly sales total report is added at a web address the app answers, also with no login check. It is not yet shown on the page.",
+    "The front page now loads an extra add-on script from a file in the project, and it places an empty chart area on the page. Nothing draws the chart yet.",
+    "The customer data pages are still behind the staff login, but these new reports sit outside that protection."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Customer personal data downloadable without any staff login",
+      "explanation": "The customer list route is mounted without the staff login check that protects the customer pages. Anyone who types or finds the address can download every customer's name, email, phone and birthday, plus spending totals, with no password. The front-page link makes this easy to find. This is a serious data exposure and likely a privacy-law problem, so the route should be protected before the change goes live.",
+      "where": [
+        "src/server.js",
+        "src/routes/reports.js",
+        "public/index.html"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "privacy",
+      "title": "Monthly sales totals also open to the public",
+      "explanation": "The monthly sales report route has the same missing login check. It reveals the business's revenue by month to anyone who finds the address. This is less personal than the customer list but still private business information.",
+      "where": [
+        "src/server.js",
+        "src/routes/reports.js"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "reliability",
+      "title": "Spreadsheet export breaks when names contain commas or formulas",
+      "explanation": "The download joins fields with plain commas and does not quote them. A name such as \"Smith, Jane\" would split into two columns for the accountant. A field starting with an equals sign could also run as a formula when opened in a spreadsheet. This is an annoyance and a minor security concern, not a data loss.",
+      "where": [
+        "src/routes/reports.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can you add the same staff login check used for the customer pages to the reports routes before we publish, and confirm that a logged-out visitor gets refused?",
+    "Should the \"Download customer list\" link and the chart area be shown only to logged-in staff, or removed from the public front page entirely?",
+    "What is in the vendor chart file, where did it come from, and do we have a licence and a trusted source for it?",
+    "Can the CSV export quote each field properly and protect against spreadsheet formulas, so names with commas land in the right columns?"
+  ],
+  "good_news": [
+    "The change is small and contained, touching only four files.",
+    "The customer list is sorted and selected from one table in a plain way, so the fix is likely quick to make."
+  ],
+  "files_reviewed": [
+    "public/index.html",
+    "public/vendor/chartkit.min.js",
+    "src/routes/reports.js",
+    "src/server.js"
+  ],
+  "truncated": false
+}

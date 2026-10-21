@@ -1,0 +1,81 @@
+{
+  "id": "20-large-diff-public-export",
+  "title": "Big diff (vendored 400 KB chart library) hides a public, unauthenticated customer export",
+  "stack": "Node.js / Express + static dashboard",
+  "kind": "red",
+  "mode": "worktree",
+  "generate": [
+    {
+      "path": "public/vendor/chartkit.min.js",
+      "bytes": 400000
+    }
+  ],
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "customer export (emails, phones, spend) downloadable by anyone without signing in",
+      "categories": [
+        "privacy",
+        "security",
+        "data",
+        "legal"
+      ],
+      "files": [
+        "src/routes/reports.js",
+        "src/server.js"
+      ],
+      "keywords": [
+        "anyone",
+        "without signing",
+        "without logging",
+        "no login",
+        "not logged",
+        "public",
+        "no password",
+        "unauthenticated",
+        "sign-in",
+        "log in",
+        "login"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "vendor",
+        "library",
+        "chart",
+        "third-party code",
+        "outside code"
+      ]
+    },
+    {
+      "keywords": [
+        "slow",
+        "all customers at once",
+        "memory",
+        "large"
+      ]
+    },
+    {
+      "keywords": [
+        "garbled",
+        "malformed",
+        "comma",
+        "spreadsheet",
+        "broken"
+      ]
+    },
+    {
+      "keywords": [
+        "sales",
+        "revenue",
+        "totals"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

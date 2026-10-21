@@ -1,0 +1,116 @@
+{
+  "id": "21-winback-email-every-deploy",
+  "title": "Win-back email script runs on every deploy and ignores unsubscribes",
+  "stack": "Node.js / Postgres / email API",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "the email goes out again on every deploy (several times a day)",
+      "categories": [
+        "users",
+        "reliability",
+        "legal",
+        "money",
+        "cost"
+      ],
+      "files": [
+        "scripts/winback.js",
+        "package.json"
+      ],
+      "keywords": [
+        "every deploy",
+        "each deploy",
+        "every release",
+        "each release",
+        "every time",
+        "deployment",
+        "repeated",
+        "again",
+        "duplicate",
+        "over and over",
+        "several times"
+      ]
+    },
+    {
+      "label": "people who unsubscribed still get marketing email (consent / anti-spam law)",
+      "categories": [
+        "legal",
+        "users",
+        "privacy"
+      ],
+      "files": [
+        "scripts/winback.js"
+      ],
+      "keywords": [
+        "who unsubscribed",
+        "who have unsubscribed",
+        "who had unsubscribed",
+        "has unsubscribed",
+        "have unsubscribed",
+        "already unsubscribed",
+        "unsubscribed users",
+        "unsubscribed customers",
+        "unsubscribed people",
+        "unsubscribed members",
+        "unsubscribed_at",
+        "ignores unsubscrib",
+        "opted out",
+        "opt-out",
+        "opt out",
+        "asked not to",
+        "without consent",
+        "never agreed",
+        "didn't agree",
+        "did not agree"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "cost",
+        "bill",
+        "sending limit",
+        "reputation",
+        "blocked"
+      ]
+    },
+    {
+      "keywords": [
+        "test",
+        "staging",
+        "preview"
+      ]
+    },
+    {
+      "keywords": [
+        "never",
+        "new accounts",
+        "brand-new",
+        "never-active",
+        "discount goes"
+      ]
+    },
+    {
+      "keywords": [
+        "fail",
+        "stop the rest",
+        "break the deploy",
+        "crash"
+      ]
+    },
+    {
+      "keywords": [
+        "unchecked",
+        "inserted",
+        "html"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

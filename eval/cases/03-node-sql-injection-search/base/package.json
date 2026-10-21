@@ -1,0 +1,8 @@
+{
+  "name": "plantly-catalog",
+  "version": "0.9.2",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node src/index.js", "test": "node --test" },
+  "dependencies": { "express": "^4.19.2", "pg": "^8.12.0" }
+}

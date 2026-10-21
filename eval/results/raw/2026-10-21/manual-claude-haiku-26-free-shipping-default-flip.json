@@ -1,0 +1,62 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-17-11-7d9acc",
+  "created_at": "2026-10-21T19:17:11.163Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/26-free-shipping-default-flip",
+  "base": "416a37fcdacc55da10d5632291e17ae288ac12c5",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Shipping is now free on every order unless a setting is switched off, which would cost money in normal weeks.",
+  "what_changed": [
+    "Free shipping is now the default for every order. Before this change, it was off unless someone turned it on.",
+    "To keep normal shipping charges, the setting must be set to \"false\". Leaving it unset now means customers pay no shipping at all.",
+    "The normal shipping rules are unchanged: a $5.99 flat fee, and free shipping on orders of $75 or more.",
+    "The change also moves the port, currency and shipping settings into one new file. The currency setting is added but nothing in this change uses it."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Every order ships free unless a setting is explicitly turned off",
+      "explanation": "Before this change, free shipping only applied when someone deliberately switched it on. The new code reverses that: unless the setting is exactly \"false\", every order ships free. The project notes list only the port and the payment key as production settings, so nothing turns it off. Customers would then skip the $5.99 fee on every order, including orders under $75, and the company would absorb that cost until someone notices.",
+      "where": [
+        "src/config.js",
+        "src/cart/shipping.js",
+        "README.md"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "low",
+      "category": "money",
+      "title": "A mistyped threshold value charges the flat fee on every order",
+      "explanation": "If the free-shipping threshold setting is set to something that is not a number, the code treats the threshold as missing. Every order then gets the $5.99 fee, including orders over $75. This is unlikely, because it only happens after a typing mistake in the setting, but customers would be overcharged and the mistake would be easy to miss.",
+      "where": [
+        "src/config.js",
+        "src/cart/shipping.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Should free shipping be on all the time, or only during promo weekends as the project notes say? If only on promo weekends, please set the default back to off.",
+    "Before publishing, will the production setting for free shipping be explicitly set to \"false\"? If not, please change the default back so that unset means off.",
+    "Which pages or checkout steps call the shipping function? This repository only defines it and does not call it, so please confirm where customers see the shipping charge.",
+    "Can the threshold setting be checked when the app starts, so a bad value stops the publish instead of quietly charging every customer?"
+  ],
+  "good_news": [
+    "The change is small and contained, in two files.",
+    "The $5.99 fee and the $75 threshold keep the same values as before, so nothing else in the pricing changed.",
+    "Moving the settings into one file makes them easier to find and check."
+  ],
+  "files_reviewed": [
+    "src/cart/shipping.js",
+    "src/config.js"
+  ],
+  "truncated": false
+}

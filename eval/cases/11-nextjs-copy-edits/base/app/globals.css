@@ -1,0 +1,4 @@
+:root { --ink: #1d1b26; --accent: #7a5cff; }
+body { font-family: system-ui, sans-serif; color: var(--ink); margin: 0; }
+.hero { padding: 96px 24px; text-align: center; }
+.cta { background: var(--accent); color: white; padding: 12px 20px; border-radius: 8px; text-decoration: none; }

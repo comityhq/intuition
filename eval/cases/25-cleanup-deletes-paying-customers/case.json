@@ -1,0 +1,61 @@
+{
+  "id": "25-cleanup-deletes-paying-customers",
+  "title": "'Delete stale data' job removes accounts that haven't logged in for 90 days, including active subscribers",
+  "stack": "Python worker / Postgres",
+  "kind": "red",
+  "mode": "worktree",
+  "difficulty": "hard",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "paying subscribers who never log in get their accounts (and orders) permanently deleted",
+      "categories": [
+        "data",
+        "users",
+        "money",
+        "legal"
+      ],
+      "files": [
+        "jobs/cleanup.py",
+        "jobs/schedule.py"
+      ],
+      "keywords": [
+        "subscri",
+        "paying",
+        "customers",
+        "accounts",
+        "permanent",
+        "delete",
+        "deleted",
+        "erase",
+        "wipe",
+        "active"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "backup",
+        "undo",
+        "restore"
+      ]
+    },
+    {
+      "keywords": [
+        "lock",
+        "slow",
+        "large"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

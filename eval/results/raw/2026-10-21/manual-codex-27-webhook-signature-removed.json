@@ -1,0 +1,43 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-02-02-a626a0",
+  "created_at": "2026-10-21T19:02:02.848Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/27-webhook-signature-removed",
+  "base": "62d8fc7709d6b1458d92aabcdcaf5101c184952b",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Payment messages now lack proof they came from the payment company, so unpaid orders can be marked paid.",
+  "what_changed": [
+    "The payment connection now accepts payment-success messages without checking who sent them.",
+    "A received payment-success message can mark an order as paid and send it to the printer.",
+    "The app now records each message type and order reference in its logs."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "security",
+      "title": "Anyone can fake paid orders",
+      "explanation": "Anyone who can reach this public payment connection can send a fake payment-success message. The app may mark a chosen order as paid and send it for fulfilment without receiving money. This can cause lost products, staff time, and customer disputes. Do not publish this change until the sender check is restored while preserving the original message for checking.",
+      "where": [
+        "src/webhooks/payments.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "How will the new load balancer preserve the original payment message so we can restore the sender check before release?",
+    "Can we confirm that a fake payment-success message cannot mark an order as paid or send it to the printer?"
+  ],
+  "good_news": [
+    "The change is limited to the payment message connection and is straightforward to reverse."
+  ],
+  "files_reviewed": [
+    "src/webhooks/payments.js"
+  ],
+  "truncated": false
+}

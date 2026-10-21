@@ -1,0 +1,44 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-09-40-547cff",
+  "created_at": "2026-10-21T19:09:40.749Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/21-winback-email-every-deploy",
+  "base": "12283cd4442c48323968ac030c9ab901ae006d1a",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Publishing the app will repeatedly email every inactive customer without a safeguard against duplicate campaigns.",
+  "what_changed": [
+    "Each app publish now also starts a win-back email campaign.",
+    "Every customer inactive for 30 days, including customers with no activity date, receives a 40% discount offer."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "legal",
+      "title": "Emails repeat on every publish",
+      "explanation": "Every publish selects the same inactive customers again. A customer can receive this marketing email each time the team publishes, because the change records no prior send or waiting period. This can create spam complaints, unsubscribe violations, and customer trust damage. Send campaigns through a controlled process that records sends and enforces a campaign frequency limit.",
+      "where": [
+        "package.json",
+        "scripts/winback.js"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Does the customer list include only people who agreed to marketing emails and have not unsubscribed?",
+    "Does the email service automatically add a working unsubscribe link to this campaign?"
+  ],
+  "good_news": [
+    "The campaign only targets people who have been inactive for at least 30 days."
+  ],
+  "files_reviewed": [
+    "package.json",
+    "scripts/winback.js"
+  ],
+  "truncated": false
+}

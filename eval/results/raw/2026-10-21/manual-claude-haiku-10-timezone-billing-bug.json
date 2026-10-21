@@ -1,0 +1,73 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-16-20-d4fdb4",
+  "created_at": "2026-10-21T19:16:20.983Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/10-timezone-billing-bug",
+  "base": "138885c62a6368b9d6a8c9b1291f59795eaaa055",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The change bills customers on their own local day, but it can charge the same customer twice and skips renewals on days 29 to 31.",
+  "what_changed": [
+    "Customers are now billed on their renewal day in their own time zone, instead of at the exact signup time.",
+    "The billing job checks every hour whether a customer's renewal day has started in that customer's time zone.",
+    "Each charge now carries a duplicate-protection reference that changes every hour, instead of one fixed reference per renewal date. This was not asked for in the description.",
+    "The stored next renewal time is no longer moved forward after a charge. The billing date is now recorded as the day the charge ran.",
+    "Customers who signed up on the 29th, 30th or 31st will not be charged in months that do not have that day. The old code moved their charge to the last day of the month."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Customers can be charged twice on the same renewal day",
+      "explanation": "The job compares the customer's local date with the billing computer's date, but records the billing date using the computer's date. Assuming the computer runs on UTC, almost every customer outside UTC is affected. For example, a Los Angeles customer is charged just after local midnight, then charged again later that day when the computer's date changes, because the recorded date does not match. The hourly reference changes too, so the payment company will not block the second charge. Fix before shipping: use the customer's time zone for both the check and the recorded date, and test with a non-UTC customer.",
+      "where": [
+        "billing/renewals.py",
+        "billing/run.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Customers signed up on days 29 to 31 are skipped in short months",
+      "explanation": "The new check only bills when today's day number matches the renewal day exactly. A customer signed up on the 31st will never match in months with 30 days or fewer, so that month's payment is never collected. The old code handled this by moving the charge to the last day of the month, and that helper still exists in the code but is no longer used. Fix before shipping: restore the last-day fallback for short months.",
+      "where": [
+        "billing/renewals.py",
+        "billing/dates.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "A retry after a failed or slow charge can charge the customer again",
+      "explanation": "The old reference stayed the same for the whole renewal date, so the payment company could recognise a repeat. The new reference includes the current hour, so a retry in a later hour looks like a new payment. If the first charge went through but the reply timed out (the code waits 15 seconds), the next hourly run charges again. Fix before shipping: keep the reference fixed per customer per renewal date.",
+      "where": [
+        "billing/renewals.py",
+        "billing/gateway.py"
+      ],
+      "confidence": "medium"
+    }
+  ],
+  "questions_for_developer": [
+    "Does the billing job save the 'last billed' date to the database right after each charge? The save step in the repository is only a placeholder, so this cannot be confirmed from here.",
+    "Should every customer get one fixed charge reference per renewal date, so a retry can never charge twice?",
+    "For customers signed up on the 29th to 31st, should the charge fall on the last day of short months, as the old code did?",
+    "Does anything outside this repository, such as the app or customer emails, show the old 'next billing date'? That field is no longer updated, so it could show wrong dates.",
+    "What happens if a customer's time zone is missing or invalid? Would that stop the whole hourly run before other customers are billed?"
+  ],
+  "good_news": [
+    "The change is small and limited to one file, which makes the fixes easy to target.",
+    "The code still records the charge after the payment succeeds, so a failed payment is not marked as billed.",
+    "The duplicate-protection header is still sent to the payment company, so fixing the reference is enough to restore that protection."
+  ],
+  "files_reviewed": [
+    "billing/renewals.py"
+  ],
+  "truncated": false
+}

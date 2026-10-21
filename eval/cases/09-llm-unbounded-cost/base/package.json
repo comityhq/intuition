@@ -1,0 +1,8 @@
+{
+  "name": "helpdeskly-worker",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "scripts": { "start": "node src/scheduler.js", "test": "node --test" },
+  "dependencies": { "openai": "^4.68.0", "pg": "^8.12.0", "node-cron": "^3.0.3" }
+}

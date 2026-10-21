@@ -1,0 +1,31 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-08-25-a4aa4a",
+  "created_at": "2026-10-21T19:08:25.648Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/15-fastapi-own-invoices-csv",
+  "base": "855bf98a09ef100933d44d1f15d15b48d0076633",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "green",
+  "headline": "Customers can download their own invoices as a CSV spreadsheet, with account checks preserved.",
+  "what_changed": [
+    "Customers can download their invoice list as an accountant-friendly CSV file.",
+    "The download includes invoice number, issue date, total, and payment status.",
+    "The existing invoice list now uses the same customer-only selection rule as the download."
+  ],
+  "risks": [],
+  "questions_for_developer": [],
+  "good_news": [
+    "The export limits results to the signed-in customer, so it does not expose other customers’ invoices.",
+    "The file download has a fixed filename and is limited to the customer’s existing invoice data."
+  ],
+  "files_reviewed": [
+    "app/routes_invoices.py",
+    "tests/test_invoices_csv.py"
+  ],
+  "truncated": false
+}

@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-09-04-67af2b",
+  "created_at": "2026-10-21T19:09:04.202Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/17-invoice-pdf-idor",
+  "base": "855bf98a09ef100933d44d1f15d15b48d0076633",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Invoice downloads expose any customer’s invoice details to other signed-in customers.",
+  "what_changed": [
+    "Customers can now download invoice documents from their invoice list.",
+    "The invoice list now includes each invoice’s internal reference number for use in downloads."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "privacy",
+      "title": "Customers can access others’ invoices",
+      "explanation": "The new invoice download address only checks that someone is signed in. It does not check that the requested invoice belongs to that person. A signed-in customer could change the invoice number in the web address and download another customer’s invoice, including their email address and billed total. Block release until the download confirms ownership before creating the file.",
+      "where": [
+        "app/routes_invoices.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "Downloaded PDFs may not display",
+      "explanation": "The generated document asks the PDF viewer to use a font that the document never defines. It also places invoice text into the document without handling characters that have special meaning in PDFs. Customers may receive blank or broken invoices, especially when invoice or customer details contain unusual characters. Use a tested PDF generator, or create a complete valid document and test representative invoices.",
+      "where": [
+        "app/pdf.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [],
+  "good_news": [
+    "The invoice list remains limited to the signed-in customer.",
+    "The change does not alter invoice totals or payment records."
+  ],
+  "files_reviewed": [
+    "app/pdf.py",
+    "app/routes_invoices.py"
+  ],
+  "truncated": false
+}

@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-50-751435",
+  "created_at": "2026-10-21T19:15:50.944Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude/10-timezone-billing-bug",
+  "base": "138885c62a6368b9d6a8c9b1291f59795eaaa055",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "Renewals now aim for midnight in each customer's time zone, but the change can double-charge customers and skip others entirely.",
+  "what_changed": [
+    "Subscription renewals are meant to charge customers at midnight in their own time zone, not the company's.",
+    "The system no longer tracks a set 'next renewal date' for each subscription. It now checks whether today's calendar day matches the day the customer signed up.",
+    "The protection against charging the same renewal twice now changes every hour. It used to be tied to the renewal date.",
+    "The old rule that moved the 29th, 30th and 31st to the last day of shorter months is no longer used."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Customers outside the server's time zone can be charged twice",
+      "explanation": "To avoid billing twice, the system compares the customer's local date with the server's date. For most customers these differ for part of the day. For example, a Los Angeles customer's renewal day continues after the server's clock has already moved to the next day. If the billing job runs more than once a day, which a 'midnight in each time zone' design needs, it will charge that customer a second time. The duplicate-charge protection now changes every hour, so the payment provider will not block the repeat charge either.",
+      "where": [
+        "billing/renewals.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "How often will the billing job run after this change? If it runs every hour, can a Los Angeles or Tokyo customer be charged twice on their renewal day? The 'already billed today' check uses the server's date, not the customer's.",
+    "Customers who signed up on the 29th, 30th or 31st: when will they be billed in February and in 30-day months? The old rule that moved them to the month's last day seems to be gone.",
+    "If the billing job is down on a customer's renewal day, does that customer still get billed later, or do we lose that month's payment?",
+    "If a charge goes through but saving the record then fails, could the retry an hour later charge the customer again? The protection against double charges now changes every hour."
+  ],
+  "good_news": [
+    "The change is small and only touches the renewal logic, so it is easy to fix or undo.",
+    "Each subscription already stores the customer's time zone, so the goal of billing on 'their' day can be met without changing how the database is organised."
+  ],
+  "files_reviewed": [
+    "billing/renewals.py"
+  ],
+  "truncated": false
+}

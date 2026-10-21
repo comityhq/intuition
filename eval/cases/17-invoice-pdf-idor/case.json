@@ -1,0 +1,67 @@
+{
+  "id": "17-invoice-pdf-idor",
+  "title": "New invoice PDF download checks login but not ownership (any customer can read any invoice)",
+  "stack": "Python / FastAPI / SQLAlchemy",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "any signed-in customer can download other customers' invoices by changing the number",
+      "categories": [
+        "privacy",
+        "security",
+        "data"
+      ],
+      "files": [
+        "app/routes_invoices.py"
+      ],
+      "keywords": [
+        "other customer",
+        "someone else",
+        "another customer",
+        "anyone",
+        "any customer",
+        "any invoice",
+        "any signed-in",
+        "any logged-in",
+        "guess",
+        "changing the number",
+        "change the number",
+        "belong",
+        "other people",
+        "other businesses"
+      ]
+    }
+  ],
+  "also_ok": [
+    {
+      "keywords": [
+        "void",
+        "status"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    },
+    {
+      "keywords": [
+        "pdf",
+        "display",
+        "open",
+        "corrupt"
+      ]
+    },
+    {
+      "keywords": [
+        "email address"
+      ]
+    }
+  ],
+  "max_false_positives": 2
+}

@@ -1,0 +1,68 @@
+{
+  "id": "02-fastapi-plaintext-password",
+  "title": "Signup stores passwords in plain text after removing the hashing library",
+  "stack": "Python / FastAPI / SQLAlchemy",
+  "kind": "red",
+  "mode": "worktree",
+  "expected_verdict": [
+    "red"
+  ],
+  "must_find": [
+    {
+      "label": "passwords stored/compared in plain text",
+      "categories": [
+        "security",
+        "privacy",
+        "legal"
+      ],
+      "files": [
+        "app/routes/auth.py",
+        "app/security.py",
+        "app/models.py"
+      ],
+      "keywords": [
+        "plain",
+        "readable",
+        "hash",
+        "scrambl",
+        "encrypt",
+        "unprotected",
+        "as typed",
+        "as-is",
+        "exactly as",
+        "in the clear",
+        "emailed",
+        "sends the password",
+        "by email",
+        "their password",
+        "real password"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "also_ok": [
+    {
+      "keywords": [
+        "existing",
+        "locked out",
+        "can't log in",
+        "cannot log in",
+        "old accounts",
+        "sign in"
+      ]
+    },
+    {
+      "keywords": [
+        "forgot",
+        "reset"
+      ]
+    },
+    {
+      "keywords": [
+        "anyone who knows",
+        "any email",
+        "someone else's"
+      ]
+    }
+  ]
+}

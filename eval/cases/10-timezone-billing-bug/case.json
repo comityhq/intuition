@@ -1,0 +1,70 @@
+{
+  "id": "10-timezone-billing-bug",
+  "title": "Renewals moved to customer-local midnight; mixed time zones cause double/missed charges",
+  "stack": "Python billing worker",
+  "kind": "red",
+  "mode": "commit",
+  "commit_message": "Bill subscriptions at midnight in the customer's own time zone",
+  "expected_verdict": [
+    "red",
+    "yellow"
+  ],
+  "must_find": [
+    {
+      "label": "time-zone mix-up bills some customers twice (and skips day-31 renewals)",
+      "categories": [
+        "money",
+        "users",
+        "reliability"
+      ],
+      "files": [
+        "billing/renewals.py"
+      ],
+      "keywords": [
+        "twice",
+        "double",
+        "time zone",
+        "timezone",
+        "missed",
+        "skip",
+        "31",
+        "short month",
+        "never billed",
+        "charged again",
+        "midnight",
+        "idempot",
+        "hour",
+        "server's clock",
+        "server clock",
+        "february"
+      ]
+    }
+  ],
+  "max_false_positives": 2,
+  "also_ok": [
+    {
+      "keywords": [
+        "next_renewal_at",
+        "next renewal",
+        "renewal date",
+        "no longer updated",
+        "pause",
+        "cancel"
+      ]
+    },
+    {
+      "keywords": [
+        "invalid time zone",
+        "unknown time zone",
+        "bad time zone",
+        "crash",
+        "error"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ]
+}

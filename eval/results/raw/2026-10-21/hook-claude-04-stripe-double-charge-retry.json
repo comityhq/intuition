@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-14-25-84bb94",
+  "created_at": "2026-10-21T19:14:25.179Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/hook-20261021T191307/04-stripe-double-charge-retry",
+  "base": "3a0eefdd446fbe4d6035b7a7bbcf7d81af9f47bb",
+  "head": "d5cf2c49b0d2003dbee016bb6d625bfd6f34b279",
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-opus-5-5",
+    "forked_from_session": "358e38ed-1ff4-44af-af8b-c6ed4e861a52"
+  },
+  "verdict": "red",
+  "headline": "Checkout now retries the card charge when the payment company is slow, but slow nights can charge customers two to four times.",
+  "what_changed": [
+    "When the card payment company is slow to answer, checkout now tries the charge up to 4 times instead of failing straight away.",
+    "The protection against charging the same order twice was removed. Before, it made sure the payment company only charged each order once.",
+    "Each try now adds the current time to the charge description on the customer's statement and in the payment records.",
+    "The patch was applied exactly as your colleague wrote it, on a separate branch. It has not been published or merged, and nothing was built or tested."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Customers can be charged several times for one order",
+      "explanation": "The app stops waiting after 8 seconds, but the payment company may still finish charging the card. The next try no longer carries the order's protection against doing the same thing twice (e.g. double charges), so the payment company sees it as a brand-new charge. On a slow night like tonight, some customers could pay two to four times for one order. That leads to refunds, chargebacks, angry customers and possible flags from the payment company. The fix is small: put the per-order protection back and keep the retries.",
+      "where": [
+        "src/checkout/placeOrder.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "money",
+      "title": "Extra charges aren't linked to the order, so refunds are hard",
+      "explanation": "When a later try succeeds, the order only records that last charge. Earlier charges that went through quietly have no link to the order in your system. Staff would have to dig through the payment company's records to find and refund them, and some may be missed until customers complain or dispute them.",
+      "where": [
+        "src/checkout/placeOrder.ts"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "medium",
+      "category": "users",
+      "title": "Declined cards are retried and customers wait much longer",
+      "explanation": "Every error is retried, not just slow responses, so a declined card is tried 4 times. Repeated declines can look suspicious to banks and payment companies. When the payment company is slow, a customer can also sit on the checkout page for about 40 seconds before seeing an error, and many will give up or click again.",
+      "where": [
+        "src/lib/retry.ts",
+        "src/checkout/placeOrder.ts"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Can we keep the retries but put the per-order protection against double charges back, so a retry can never create a second charge?",
+    "Can we retry only when the payment company is slow or briefly down, and not when a card is declined?",
+    "If this has already been published, how do we find customers who were charged more than once and refund them?",
+    "What is the longest a customer could wait on the checkout page before seeing an error, and is that acceptable?"
+  ],
+  "good_news": [
+    "The change is small and limited to the checkout payment step, so it is quick to correct.",
+    "It sits on its own branch and has not been published or merged, so nothing has reached customers yet.",
+    "The commit message records the double-charge risk, so the decision is documented."
+  ],
+  "files_reviewed": [
+    "src/checkout/placeOrder.ts",
+    "src/lib/retry.ts"
+  ],
+  "truncated": false
+}

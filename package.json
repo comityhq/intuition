@@ -1,0 +1,59 @@
+{
+  "name": "comity-intuition",
+  "version": "0.1.0",
+  "description": "Your AI's gut check before you ship. A forked copy of your coding agent (Claude Code, Codex) reviews its own work read-only and explains it in plain English: verdict, business risks, questions for a developer.",
+  "keywords": [
+    "ai",
+    "ai-agents",
+    "claude",
+    "claude-code",
+    "code-review",
+    "codex",
+    "founders",
+    "gemini",
+    "hooks",
+    "non-technical",
+    "openai",
+    "vibe-coding"
+  ],
+  "homepage": "https://github.com/comityhq/intuition#readme",
+  "bugs": {
+    "url": "https://github.com/comityhq/intuition/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/comityhq/intuition.git"
+  },
+  "license": "MIT",
+  "author": "Comity (comity.so)",
+  "type": "module",
+  "bin": {
+    "comity-intuition": "dist/cli.js",
+    "intuition": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "!dist/**/*.map",
+    "!dist/**/*.tsbuildinfo",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "pretest": "npm run build",
+    "test": "vitest run",
+    "prepack": "npm run build",
+    "prepublishOnly": "npm run build && npm test",
+    "eval": "node eval/run.mjs",
+    "eval:rescore": "node eval/run.mjs --rescore"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0",
+    "vitest": "^5.0.0"
+  }
+}

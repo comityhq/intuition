@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-10-09-303483",
+  "created_at": "2026-10-21T19:10:09.216Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-codex/25-cleanup-deletes-paying-customers",
+  "base": "fd1cbfe84a4af6b4c8f73bdcae039458a7327588",
+  "head": null,
+  "reviewer": {
+    "agent": "codex",
+    "model": "gpt-5.6-terra",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The new daily cleanup can permanently delete customer accounts after 90 days without checking whether they are paying customers.",
+  "what_changed": [
+    "Expired sign-in sessions will be removed each day.",
+    "Customer accounts with no login for 90 days, including accounts that never logged in, will be permanently removed."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "data",
+      "title": "Paying customer accounts can be deleted",
+      "explanation": "The daily cleanup deletes every inactive account without checking its payment status or whether the customer still has an active service. A paying customer who does not log in for 90 days could lose their account and its stored information. This runs automatically each day and has no recovery step shown. Do not ship until the cleanup excludes active customers and uses a recoverable account-closing process.",
+      "where": [
+        "jobs/cleanup.py",
+        "jobs/schedule.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Which customers are safe to remove after 90 days, and how will active or recently paying customers be excluded?",
+    "Can account removal first mark accounts for review or allow recovery, instead of permanently deleting them immediately?",
+    "What customer information, orders, and payment records are linked to an account, and what happens to them when the account is deleted?"
+  ],
+  "good_news": [
+    "Removing expired sign-in sessions is separate from removing customer accounts, so the safer cleanup can remain in place."
+  ],
+  "files_reviewed": [
+    "jobs/cleanup.py",
+    "jobs/schedule.py"
+  ],
+  "truncated": false
+}

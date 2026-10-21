@@ -1,0 +1,26 @@
+{
+  "id": "30-benign-safe-search-sort",
+  "title": "Product search gains category filter + sort using parameters and an allow-list (safe twin of 03)",
+  "stack": "Node.js / Express / Postgres",
+  "kind": "benign",
+  "mode": "worktree",
+  "difficulty": "twin",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "also_ok": [
+    {
+      "keywords": [
+        "index",
+        "slow"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ],
+  "max_false_positives": 1
+}

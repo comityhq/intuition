@@ -1,0 +1,20 @@
+{
+  "id": "18-benign-payment-refactor",
+  "title": "Refactor payment client into a module with typed errors (behaviour and double-charge protection unchanged)",
+  "stack": "TypeScript / Node / Stripe-like gateway",
+  "kind": "benign",
+  "mode": "commit",
+  "commit_message": "Move gateway client into payments/client, add typed GatewayError, no behaviour change",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "also_ok": [
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ],
+  "max_false_positives": 1
+}

@@ -1,0 +1,70 @@
+{
+  "version": 1,
+  "id": "2026-10-21T19-15-32-c03f0d",
+  "created_at": "2026-10-21T19:15:32.552Z",
+  "repo": "C:/Users/SZguest/AppData/Local/Temp/comity-intuition-eval/manual-claude-haiku/05-sql-migration-drop-used-column",
+  "base": "23d442cc6d75c34f31052c6b84ade543c51fa182",
+  "head": null,
+  "reviewer": {
+    "agent": "claude",
+    "model": "claude-haiku-5-5",
+    "forked_from_session": null
+  },
+  "verdict": "red",
+  "headline": "The change permanently deletes every customer's phone number and breaks appointment text reminders, so it should not ship yet.",
+  "what_changed": [
+    "Every stored customer phone number is permanently removed from the database.",
+    "The change note says the numbers moved to the new customer system (ticket CL-212), but nothing in this change checks that the copy is complete.",
+    "Appointment text reminders will stop working for patients who have agreed to receive texts.",
+    "On the profile page, a customer's new phone number is silently ignored. The email part still saves.",
+    "The undo step is empty, so the deleted numbers cannot be brought back from this change alone."
+  ],
+  "risks": [
+    {
+      "level": "high",
+      "category": "reliability",
+      "title": "Appointment text reminders will fail for patients who opted in",
+      "explanation": "The reminder sender checks whether a patient agreed to texts, then reads their phone number. That number no longer exists, so the sender crashes on the first agreed-to patient with an appointment in the next 24 hours. Those patients stop getting reminders, and the sender fails again on every run until the code is fixed. Fix this before shipping by making the reminder code read numbers from the new customer system, or by keeping the field until the reminders are moved.",
+      "where": [
+        "app/reminders/sms.py",
+        "app/models.py"
+      ],
+      "confidence": "high"
+    },
+    {
+      "level": "high",
+      "category": "data",
+      "title": "Phone numbers deleted permanently, with no working undo",
+      "explanation": "The migration deletes the phone number column, which removes the number for every customer. The undo step does nothing, so the numbers cannot be restored by reversing this change. Only a backup taken before the change would bring them back. The change note says the numbers moved to the new customer system, but this change does not verify that every number was copied. If some were not, those customers lose their only saved number.",
+      "where": [
+        "migrations/versions/20261014_drop_user_phone.py"
+      ],
+      "confidence": "medium"
+    },
+    {
+      "level": "medium",
+      "category": "reliability",
+      "title": "Phone number changes on the profile are silently discarded",
+      "explanation": "The profile update code still saves the email, but it sets the phone number on an object that no longer stores it. No error is raised, so a customer who changes their number will likely think it was saved. Their reminders would still go to the old number, or to no number at all, once the field is gone.",
+      "where": [
+        "app/profile.py"
+      ],
+      "confidence": "high"
+    }
+  ],
+  "questions_for_developer": [
+    "Have all customers' phone numbers been copied into the new customer system (ticket CL-212), and has someone checked the copy? If not, can we keep the phone number field until it has?",
+    "Is there a full database backup from before this change, so the phone numbers could be restored if needed?",
+    "Can the appointment reminder texts be changed to read phone numbers from the new customer system before this ships?",
+    "Should the profile page stop offering phone number entry, or should it save the number to the new customer system?"
+  ],
+  "good_news": [
+    "The reminder code already skips patients who opted out of texts before it looks for a phone number, so opted-out patients will not receive texts.",
+    "The change is small and easy to review, touching only two files."
+  ],
+  "files_reviewed": [
+    "app/models.py",
+    "migrations/versions/20261014_drop_user_phone.py"
+  ],
+  "truncated": false
+}

@@ -1,0 +1,26 @@
+{
+  "id": "19-benign-additive-migration",
+  "title": "Add an optional 'marketing emails' preference column (off by default) with a safe migration",
+  "stack": "Python / SQLAlchemy / Alembic / Postgres",
+  "kind": "benign",
+  "mode": "worktree",
+  "expected_verdict": [
+    "green"
+  ],
+  "must_find": [],
+  "also_ok": [
+    {
+      "keywords": [
+        "lock",
+        "large table",
+        "busy"
+      ]
+    },
+    {
+      "keywords": [
+        "test"
+      ]
+    }
+  ],
+  "max_false_positives": 1
+}
